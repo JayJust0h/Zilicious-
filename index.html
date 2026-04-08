@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zilicious Catering - Order Now</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rose: #9f2a6f;
+      --rose-light: #c4528a;
+      --rose-pale: #fdf0f7;
+      --gold: #c9954c;
+      --dark: #1a0d14;
+      --mid: #5a3a4a;
+      --muted: #9e8090;
+      --line: #ecdde6;
+      --white: #fff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f9f0f5;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--dark);
+      color: var(--white);
+      text-align: center;
+      padding: 36px 20px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(159,42,111,0.35) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .logo-img {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      border-radius: 50%;
+      display: block;
+      margin: 0 auto 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 4px;
+      position: relative; z-index: 1;
+    }
+    .price-note {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 6px 18px;
+      border: 1px solid rgba(201,149,76,0.45);
+      border-radius: 100px;
+      color: var(--gold);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      position: relative; z-index: 1;
+    }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 14px 130px;
+    }
+
+    /* ── CATEGORY ── */
+    .category {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(159,42,111,0.07);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    .category-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 22px 13px;
+      border-bottom: 1px solid var(--line);
+    }
+    .category-icon { font-size: 1.3rem; }
+    .category-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem;
+      color: var(--rose);
+      font-weight: 700;
+    }
+
+    /* ── MENU ITEM ── */
+    .item {
+      display: flex;
+      align-items: center;
+      padding: 13px 22px;
+      border-bottom: 1px solid var(--line);
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    .item:last-child { border-bottom: none; }
+    .item:hover { background: var(--rose-pale); }
+    .item-name {
+      flex: 1;
+      font-size: 0.92rem;
+      font-weight: 400;
+    }
+    .item-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: block;
+    }
+    .item-price {
+      font-weight: 600;
+      color: var(--rose);
+      font-size: 0.88rem;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* ── QUANTITY CONTROL ── */
+    .qty-control {
+      display: flex; align-items: center;
+      margin-left: 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 100px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .qty-control.active { border-color: var(--rose); }
+    .qty-btn {
+      width: 32px; height: 32px;
+      background: transparent;
+      border: none;
+      color: var(--rose);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .qty-btn:hover { background: var(--rose); color: white; }
+    .qty-value {
+      min-width: 26px; text-align: center;
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--dark);
+    }
+
+    /* ── FLOATING CART ── */
+    .cart-bar {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--dark);
+      color: white;
+      padding: 15px 26px;
+      border-radius: 100px;
+      box-shadow: 0 8px 32px rgba(26,13,20,0.4), 0 0 0 1px rgba(159,42,111,0.3);
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+      z-index: 1000;
+      white-space: nowrap;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+    }
+    .cart-bar.visible { transform: translateX(-50%) translateY(0); }
+    .cart-bar:hover { box-shadow: 0 12px 40px rgba(26,13,20,0.5), 0 0 0 1px rgba(159,42,111,0.5); }
+    .cart-icon { font-size: 1.15rem; }
+    .cart-label { font-size: 0.92rem; font-weight: 500; }
+    .cart-total {
+      background: var(--rose);
+      padding: 4px 14px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(26,13,20,0.75);
+      z-index: 2000;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 24px 24px 0 0;
+      width: 100%; max-width: 560px;
+      max-height: 92vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-head {
+      position: sticky; top: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px;
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+      z-index: 10;
+    }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem;
+      color: var(--rose);
+      font-weight: 700;
+    }
+    .modal-close {
+      width: 34px; height: 34px;
+      background: var(--rose-pale);
+      border: none; border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--rose);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-body { padding: 18px 22px; }
+
+    /* ── ORDER SUMMARY ── */
+    .order-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .order-item:last-child { border-bottom: none; }
+    .order-name { flex: 1; font-size: 0.9rem; }
+    .order-qty {
+      font-size: 0.82rem; color: var(--muted);
+      background: var(--rose-pale);
+      padding: 2px 10px; border-radius: 100px;
+      flex-shrink: 0;
+    }
+    .order-price { font-weight: 600; min-width: 70px; text-align: right; font-size: 0.9rem; }
+    .order-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0 4px;
+      margin-top: 4px;
+      border-top: 2px solid var(--line);
+    }
+    .order-total-label { font-weight: 600; font-size: 0.95rem; }
+    .order-total-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem; font-weight: 700;
+      color: var(--rose);
+    }
+
+    .empty-cart {
+      text-align: center; padding: 48px 20px; color: var(--muted);
+    }
+    .empty-cart .empty-icon { font-size: 2.8rem; margin-bottom: 10px; }
+
+    /* ── FORM ── */
+    .form-field { margin-bottom: 14px; }
+    .form-field label {
+      display: block; margin-bottom: 5px;
+      font-size: 0.82rem; font-weight: 500; color: var(--mid);
+      letter-spacing: 0.04em;
+    }
+    .form-field input,
+    .form-field textarea {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      color: var(--dark);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-field input:focus,
+    .form-field textarea:focus { border-color: var(--rose); }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      width: 100%; padding: 15px;
+      background: var(--rose); color: white;
+      border: none; border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.98rem; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .btn-primary:hover { background: var(--rose-light); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      width: 100%; padding: 11px;
+      background: transparent; color: var(--muted);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--rose); color: var(--rose); }
+
+    .modal-note {
+      text-align: center;
+      font-size: 0.78rem; color: var(--muted);
+      padding: 14px 22px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ── SUCCESS ── */
+    .success-screen { text-align: center; padding: 36px 16px; }
+    .success-icon { font-size: 2.8rem; margin-bottom: 14px; }
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem; color: var(--rose); font-weight: 700; margin-bottom: 8px;
+    }
+    .success-msg { color: var(--muted); font-size: 0.92rem; line-height: 1.65; }
+
+    /* ── TRANSPORT NOTE ── */
+    .transport-note {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(159,42,111,0.06);
+      padding: 14px 20px;
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.86rem; color: var(--mid);
+    }
+    .transport-note .t-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .transport-note strong { color: var(--rose); }
+
+    @media (min-width: 560px) {
+      .modal { border-radius: 24px; margin: auto; }
+      .modal-overlay { align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <img src="232784.png" alt="Zilicious Catering" class="logo-img"
+         onerror="this.style.display='none'">
+    <p class="tagline">Luxury Catering &nbsp;·&nbsp; Premium Events</p>
+    <span class="price-note">All prices per large tray · USD</span>
+  </header>
+
+  <main class="page-wrap">
+
+    <div class="transport-note">
+      <span class="t-icon">🚗</span>
+      <span><strong>Transport:</strong> Within 20-mile radius included. Beyond 20 miles: <strong>$1 per mile</strong>.</span>
+    </div>
+
+    <!-- CARBS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🥖</span><span class="category-title">Carbs</span></div>
+      <div class="item"><span class="item-name">Pilau Rice</span><span class="item-price">$130</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Coconut Rice</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Plain Rice</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Bhajias</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chips Masala</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Viazi Karai</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chapo (White)</span><span class="item-price">$2 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chapo (Brown)</span><span class="item-price">$2.50 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+    <!-- PROTEINS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🍖</span><span class="category-title">Proteins</span></div>
+      <div class="item"><span class="item-name">Mbuzi Wet Fry</span><span class="item-price">$300</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Goat Curry</span><span class="item-price">$280</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Beef Stew</span><span class="item-price">$260</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Curry Stew</span><span class="item-price">$220</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Teriyaki Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$150</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Tikka Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Baked Chicken Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+    <!-- VEGGIES -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🥦</span><span class="category-title">Veggies</span></div>
+      <div class="item"><span class="item-name">Kachumbari</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mixed Veggies</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Creamy Spinach</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Creamy Mushrooms</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Coconut Beans</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Lentils</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Salad Platter</span><span class="item-price">$80</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+    <!-- SNACKS N FRUITS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🥟</span><span class="category-title">Snacks &amp; Fruits</span></div>
+      <div class="item"><span class="item-name">Beef Samosas<span class="item-sub">50 pcs</span></span><span class="item-price">$125</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Fruit Platter</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mahamris</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Farmers Choice Kenya Sausages</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Kebabs</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Meatpies</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+    <!-- KIDS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🧒</span><span class="category-title">Kids</span></div>
+      <div class="item"><span class="item-name">Chicken Nuggets</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Fries</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Pasta 'N' Meatballs</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mac N Cheese</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+    <!-- BEVERAGES -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">☕</span><span class="category-title">Beverages</span></div>
+      <div class="item"><span class="item-name">Chai Masala<span class="item-sub">50 cups</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chai<span class="item-sub">50 cups</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+    <!-- CHAFERS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">✨</span><span class="category-title">Chafers</span></div>
+      <div class="item"><span class="item-name">Chafing Dishes (Gold Luxury)</span><span class="item-price">$15 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chafing Dishes (Silver)</span><span class="item-price">$10 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+    </div>
+
+  </main>
+
+  <!-- Floating cart bar -->
+  <div class="cart-bar" id="cartBar" onclick="openModal()">
+    <span class="cart-icon">🛒</span>
+    <span class="cart-label" id="cartLabel">0 items</span>
+    <span class="cart-total" id="cartTotal">$0</span>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-head">
+        <span class="modal-title" id="modalTitle">Your Order</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <!-- Screen 1: Summary -->
+      <div id="screenSummary">
+        <div class="modal-body" id="summaryBody"></div>
+        <div style="padding:0 22px 8px;">
+          <button class="btn-primary" id="proceedBtn" onclick="showForm()">Confirm Order →</button>
+        </div>
+        <p class="modal-note">We'll contact you to confirm delivery &amp; payment details.</p>
+      </div>
+
+      <!-- Screen 2: Contact Details -->
+      <div id="screenForm" style="display:none;">
+        <div class="modal-body">
+          <div class="form-field">
+            <label>Full Name *</label>
+            <input type="text" id="fName" placeholder="Your full name">
+          </div>
+          <div class="form-field">
+            <label>Phone Number *</label>
+            <input type="tel" id="fPhone" placeholder="+254 7XX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label>Event Date *</label>
+            <input type="date" id="fDate">
+          </div>
+          <div class="form-field">
+            <label>Delivery / Pickup Location</label>
+            <textarea id="fAddress" rows="2" placeholder="Address or pickup point"></textarea>
+          </div>
+          <div class="form-field">
+            <label>Additional Notes</label>
+            <textarea id="fNotes" rows="2" placeholder="Any special requests or dietary requirements"></textarea>
+          </div>
+          <button class="btn-primary" onclick="submitOrder()">Submit Order ✓</button>
+          <button class="btn-ghost" onclick="showSummary()">← Back to Order</button>
+        </div>
+        <p class="modal-note">We'll reach out shortly to finalize everything.</p>
+      </div>
+
+      <!-- Screen 3: Success -->
+      <div id="screenSuccess" style="display:none;">
+        <div class="modal-body">
+          <div class="success-screen">
+            <div class="success-icon">👑</div>
+            <div class="success-title">Order Received!</div>
+            <p class="success-msg" id="successMsg"></p>
+          </div>
+          <button class="btn-primary" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cart = {};
+
+    function parsePrice(priceText) {
+      return parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function changeQty(btn, delta) {
+      const item  = btn.closest('.item');
+      const nameEl = item.querySelector('.item-name');
+      // Get just the text node, not the sub-label
+      const name  = nameEl.childNodes[0].textContent.trim();
+      const price = parsePrice(item.querySelector('.item-price').textContent);
+      const ctrl  = item.querySelector('.qty-control');
+      const span  = item.querySelector('.qty-value');
+
+      if (!cart[name]) cart[name] = { qty: 0, price };
+      cart[name].qty = Math.max(0, cart[name].qty + delta);
+      if (cart[name].qty === 0) delete cart[name];
+
+      span.textContent = cart[name] ? cart[name].qty : 0;
+      ctrl.classList.toggle('active', !!(cart[name] && cart[name].qty > 0));
+
+      updateCartBar();
+    }
+
+    function updateCartBar() {
+      let count = 0, total = 0;
+      Object.values(cart).forEach(i => { count += i.qty; total += i.qty * i.price; });
+
+      document.getElementById('cartLabel').textContent = count === 1 ? '1 item' : `${count} items`;
+      document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+      document.getElementById('cartBar').classList.toggle('visible', count > 0);
+    }
+
+    function openModal() {
+      showSummary();
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function showSummary() {
+      document.getElementById('modalTitle').textContent = 'Your Order';
+      document.getElementById('screenSummary').style.display = 'block';
+      document.getElementById('screenForm').style.display = 'none';
+      document.getElementById('screenSuccess').style.display = 'none';
+
+      const body = document.getElementById('summaryBody');
+      const keys = Object.keys(cart);
+
+      if (keys.length === 0) {
+        body.innerHTML = `<div class="empty-cart"><div class="empty-icon">🛒</div><p>Your cart is empty.<br>Add items from the menu above.</p></div>`;
+        document.getElementById('proceedBtn').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('proceedBtn').style.display = 'block';
+      let grandTotal = 0;
+      let html = '';
+
+      keys.forEach(name => {
+        const { qty, price } = cart[name];
+        const sub = qty * price;
+        grandTotal += sub;
+        html += `
+          <div class="order-item">
+            <span class="order-name">${name}</span>
+            <span class="order-qty">× ${qty}</span>
+            <span class="order-price">$${sub.toLocaleString()}</span>
+          </div>`;
+      });
+
+      html += `
+        <div class="order-total-row">
+          <span class="order-total-label">Total</span>
+          <span class="order-total-value">$${grandTotal.toLocaleString()}</span>
+        </div>`;
+
+      body.innerHTML = html;
+    }
+
+    function showForm() {
+      if (Object.keys(cart).length === 0) return;
+      document.getElementById('modalTitle').textContent = 'Contact Details';
+      document.getElementById('screenSummary').style.display = 'none';
+      document.getElementById('screenForm').style.display = 'block';
+    }
+
+    function submitOrder() {
+      const name  = document.getElementById('fName').value.trim();
+      const phone = document.getElementById('fPhone').value.trim();
+      const date  = document.getElementById('fDate').value;
+
+      if (!name || !phone || !date) {
+        alert('Please fill in your Full Name, Phone Number, and Event Date.');
+        return;
+      }
+
+      const total = document.getElementById('cartTotal').textContent;
+      const fmtDate = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', {
+        weekday:'long', day:'numeric', month:'long', year:'numeric'
+      });
+
+      document.getElementById('successMsg').innerHTML =
+        `Thank you, <strong>${name}</strong>! Your order totalling <strong>${total}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you on <strong>${phone}</strong> shortly to confirm all details and arrange delivery or pickup.`;
+
+      document.getElementById('modalTitle').textContent = 'All Done!';
+      document.getElementById('screenForm').style.display = 'none';
+      document.getElementById('screenSuccess').style.display = 'block';
+
+      // Reset cart
+      Object.keys(cart).forEach(k => delete cart[k]);
+      document.querySelectorAll('.qty-value').forEach(el => el.textContent = '0');
+      document.querySelectorAll('.qty-control').forEach(el => el.classList.remove('active'));
+      updateCartBar();
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    });
+  </script>
+</body>
+</html>
