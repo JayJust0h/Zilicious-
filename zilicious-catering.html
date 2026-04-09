@@ -3,502 +3,356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zilicious Catering - Order Now</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>Zilicious Catering</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --rose: #9f2a6f;
-      --rose-light: #c4528a;
-      --rose-pale: #fdf0f7;
-      --gold: #c9954c;
-      --dark: #1a0d14;
-      --mid: #5a3a4a;
-      --muted: #9e8090;
-      --line: #ecdde6;
-      --white: #fff;
+      --rose:#9f2a6f; --rose-light:#c4528a; --rose-pale:#fdf0f7;
+      --gold:#c9954c; --dark:#1a0d14; --mid:#5a3a4a;
+      --muted:#9e8090; --line:#ecdde6; --white:#fff;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#f9f0f5;color:var(--dark);min-height:100vh}
+
+    /* HEADER */
+    .header{background:var(--dark);color:var(--white);text-align:center;padding:36px 20px 28px;position:relative;overflow:hidden}
+    .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(159,42,111,.35) 0%,transparent 70%);pointer-events:none}
+    .logo-img{width:150px;height:150px;object-fit:contain;border-radius:50%;display:block;margin:0 auto 10px;position:relative;z-index:1}
+    .tagline{color:var(--muted);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;margin-top:4px;position:relative;z-index:1}
+    .price-note{display:inline-block;margin-top:14px;padding:6px 18px;border:1px solid rgba(201,149,76,.45);border-radius:100px;color:var(--gold);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;position:relative;z-index:1}
+
+    /* LAYOUT */
+    .page-wrap{max-width:860px;margin:0 auto;padding:28px 14px 130px}
+
+    /* CATEGORY */
+    .category{background:var(--white);border-radius:16px;box-shadow:0 2px 16px rgba(159,42,111,.07);margin-bottom:18px;overflow:hidden}
+    .category-header{display:flex;align-items:center;gap:10px;padding:16px 22px 13px;border-bottom:1px solid var(--line)}
+    .category-icon{font-size:1.3rem}
+    .category-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;color:var(--rose);font-weight:700}
+
+    /* MENU ITEM */
+    .item{display:flex;align-items:center;padding:11px 22px;border-bottom:1px solid var(--line);gap:10px;transition:background .15s}
+    .item:last-child{border-bottom:none}
+    .item:hover{background:var(--rose-pale)}
+    .item-name{flex:1;font-size:.9rem;font-weight:400}
+    .item-sub{font-size:.76rem;color:var(--muted);display:block}
+    .item-price{font-weight:600;color:var(--rose);font-size:.86rem;min-width:72px;text-align:right}
+
+    /* QTY CONTROL — now with editable input */
+    .qty-control{display:flex;align-items:center;margin-left:10px;border:1.5px solid var(--line);border-radius:100px;overflow:hidden;transition:border-color .2s;flex-shrink:0}
+    .qty-control.active{border-color:var(--rose)}
+    .qty-btn{width:30px;height:30px;background:transparent;border:none;color:var(--rose);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;line-height:1}
+    .qty-btn:hover{background:var(--rose);color:white}
+    .qty-input{width:38px;height:30px;border:none;text-align:center;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:var(--dark);background:transparent;outline:none;-moz-appearance:textfield}
+    .qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+    /* CART BAR */
+    .cart-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:white;padding:15px 26px;border-radius:100px;box-shadow:0 8px 32px rgba(26,13,20,.4),0 0 0 1px rgba(159,42,111,.3);display:flex;align-items:center;gap:12px;cursor:pointer;z-index:1000;white-space:nowrap;transition:transform .4s cubic-bezier(.175,.885,.32,1.275),box-shadow .2s}
+    .cart-bar.visible{transform:translateX(-50%) translateY(0)}
+    .cart-bar:hover{box-shadow:0 12px 40px rgba(26,13,20,.5),0 0 0 1px rgba(159,42,111,.5)}
+    .cart-total{background:var(--rose);padding:4px 14px;border-radius:100px;font-weight:700;font-size:.88rem}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,13,20,.75);z-index:2000;align-items:flex-end;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.175,.885,.32,1.275)}
+    @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:var(--white);border-bottom:1px solid var(--line);z-index:10}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;color:var(--rose);font-weight:700}
+    .modal-close{width:34px;height:34px;background:var(--rose-pale);border:none;border-radius:50%;cursor:pointer;font-size:1rem;color:var(--rose);display:flex;align-items:center;justify-content:center}
+    .modal-body{padding:18px 22px}
+
+    /* ORDER SUMMARY */
+    .order-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+    .order-item:last-child{border-bottom:none}
+    .order-name{flex:1;font-size:.9rem}
+    .order-qty{font-size:.8rem;color:var(--muted);background:var(--rose-pale);padding:2px 10px;border-radius:100px;flex-shrink:0}
+    .order-price{font-weight:600;min-width:70px;text-align:right;font-size:.9rem}
+    .order-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0 4px;margin-top:4px;border-top:2px solid var(--line)}
+    .order-total-value{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;color:var(--rose)}
+    .empty-cart{text-align:center;padding:48px 20px;color:var(--muted)}
+    .empty-icon{font-size:2.8rem;margin-bottom:10px}
+
+    /* FORM */
+    .form-field{margin-bottom:14px}
+    .form-field label{display:block;margin-bottom:5px;font-size:.82rem;font-weight:500;color:var(--mid);letter-spacing:.04em}
+    .form-field input,.form-field textarea,.form-field select{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--dark);transition:border-color .2s;outline:none;background:white}
+    .form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--rose)}
+    .phone-row{display:flex;gap:8px}
+    .phone-flag{display:flex;align-items:center;gap:6px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:.9rem;white-space:nowrap;color:var(--mid);background:#faf7f9;flex-shrink:0}
+    .phone-row input{flex:1}
+
+    /* BUTTONS */
+    .btn-primary{width:100%;padding:15px;background:var(--rose);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.98rem;font-weight:600;cursor:pointer;letter-spacing:.02em;transition:background .2s,transform .1s;margin-top:8px}
+    .btn-primary:hover{background:var(--rose-light)}
+    .btn-primary:active{transform:scale(.98)}
+    .btn-primary:disabled{background:var(--muted);cursor:not-allowed;transform:none}
+    .btn-ghost{width:100%;padding:11px;background:transparent;color:var(--muted);border:1.5px solid var(--line);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;margin-top:8px;transition:border-color .2s,color .2s}
+    .btn-ghost:hover{border-color:var(--rose);color:var(--rose)}
+    .modal-note{text-align:center;font-size:.78rem;color:var(--muted);padding:14px 22px;border-top:1px solid var(--line)}
+
+    /* SUCCESS */
+    .success-screen{text-align:center;padding:36px 16px}
+    .success-icon{font-size:2.8rem;margin-bottom:14px}
+    .success-title{font-family:'Cormorant Garamond',serif;font-size:1.75rem;color:var(--rose);font-weight:700;margin-bottom:8px}
+    .success-msg{color:var(--muted);font-size:.92rem;line-height:1.65}
+
+    /* TRANSPORT NOTE */
+    .transport-note{background:var(--white);border-radius:12px;box-shadow:0 2px 12px rgba(159,42,111,.06);padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:12px;font-size:.86rem;color:var(--mid)}
+    .transport-note strong{color:var(--rose)}
+
+    /* SPINNER */
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── ADMIN ── */
+    #adminPanel{display:none;max-width:980px;margin:0 auto;padding:24px 14px 60px}
+    .admin-header{background:var(--dark);color:white;padding:24px 26px;border-radius:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .admin-header h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem}
+    .admin-header p{color:var(--muted);font-size:.8rem;margin-top:2px}
+    .admin-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .tab-btn{padding:9px 20px;border-radius:100px;border:1.5px solid var(--line);background:var(--white);font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s;font-weight:500}
+    .tab-btn.active{background:var(--rose);color:white;border-color:var(--rose)}
+    .tab-pane{display:none}
+    .tab-pane.active{display:block}
+
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+    .stat-box{background:var(--white);border-radius:12px;padding:16px 18px;box-shadow:0 2px 12px rgba(159,42,111,.07)}
+    .stat-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+    .stat-val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--rose);font-weight:700;margin-top:2px}
+
+    /* REPORT */
+    .report-filter{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+    .report-filter select{padding:9px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--dark);background:white;outline:none;cursor:pointer}
+    .report-filter select:focus{border-color:var(--rose)}
+    .report-table{width:100%;background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(159,42,111,.06)}
+    .report-table table{width:100%;border-collapse:collapse}
+    .report-table th{background:var(--rose);color:white;padding:12px 16px;text-align:left;font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+    .report-table td{padding:12px 16px;border-bottom:1px solid var(--line);font-size:.88rem}
+    .report-table tr:last-child td{border-bottom:none}
+    .report-table tr:hover td{background:var(--rose-pale)}
+    .report-summary{background:var(--rose-pale);border-radius:12px;padding:16px 20px;margin-top:14px;display:flex;gap:24px;flex-wrap:wrap}
+    .report-summary .rs-item .rs-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .report-summary .rs-item .rs-val{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--rose);font-weight:700}
+
+    /* ORDER CARDS */
+    .order-card{background:var(--white);border-radius:14px;margin-bottom:12px;box-shadow:0 2px 12px rgba(159,42,111,.06);overflow:hidden}
+    .order-card-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:15px 20px;border-bottom:1px solid var(--line);cursor:pointer}
+    .order-card-head:hover{background:var(--rose-pale)}
+    .order-meta{font-size:.8rem;color:var(--muted);margin-top:2px}
+    .order-card-body{padding:16px 20px;display:none}
+    .order-card-body.open{display:block}
+    .order-badge{background:var(--rose);color:white;border-radius:100px;padding:4px 14px;font-size:.8rem;font-weight:600;white-space:nowrap}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:14px}
+    .dl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+    .dv{font-size:.9rem;font-weight:500}
+    .order-items-list{background:var(--rose-pale);border-radius:10px;padding:12px 14px;font-size:.86rem}
+    .order-items-list div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)}
+    .order-items-list div:last-child{border-bottom:none;font-weight:700;color:var(--rose)}
+
+    /* BLOCKED DATES */
+    .blocked-section{background:var(--white);border-radius:14px;padding:20px;box-shadow:0 2px 12px rgba(159,42,111,.06)}
+    .blocked-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+    .blocked-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--rose-pale);border-radius:10px;font-size:.9rem}
+    .blocked-row .bd-date{font-weight:600}
+    .blocked-row .bd-note{color:var(--muted);font-size:.82rem}
+    .btn-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.1rem;padding:2px 6px;border-radius:6px;transition:color .2s,background .2s}
+    .btn-del:hover{color:#e03;background:#fee}
+    .add-blocked-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .add-blocked-row input{flex:1;min-width:140px;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none}
+    .add-blocked-row input:focus{border-color:var(--rose)}
+    .btn-add-block{padding:10px 20px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap}
+    .btn-add-block:hover{background:var(--rose-light)}
+
+    /* ADMIN LOGIN */
+    #adminLoginPage{display:none;background:#f9f0f5;min-height:100vh}
+    .admin-login{max-width:360px;margin:80px auto;background:var(--white);border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 8px 32px rgba(159,42,111,.1)}
+    .admin-login h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--rose);margin-bottom:6px}
+    .admin-login p{color:var(--muted);font-size:.85rem;margin-bottom:24px}
+    .admin-logout{background:transparent;border:1.5px solid rgba(255,255,255,.2);color:white;padding:8px 18px;border-radius:100px;cursor:pointer;font-size:.82rem;transition:border-color .2s}
+    .admin-logout:hover{border-color:white}
+    .refresh-btn{background:var(--rose);color:white;border:none;padding:10px 20px;border-radius:100px;cursor:pointer;font-size:.85rem;font-weight:600;transition:background .2s}
+    .refresh-btn:hover{background:var(--rose-light)}
+    .no-orders{text-align:center;padding:60px 20px;color:var(--muted)}
+
+    /* INVOICE MODAL */
+    #invoiceOverlay{display:none;position:fixed;inset:0;background:rgba(26,13,20,.8);z-index:3000;align-items:center;justify-content:center;padding:16px}
+    #invoiceOverlay.open{display:flex}
+    .invoice-modal{background:white;border-radius:20px;width:100%;max-width:680px;max-height:95vh;overflow-y:auto;animation:slideUp .3s ease}
+    .invoice-actions{display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    .inv-btn{padding:9px 18px;border-radius:10px;border:1.5px solid var(--line);background:white;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;font-weight:500;transition:all .2s}
+    .inv-btn:hover{border-color:var(--rose);color:var(--rose)}
+    .inv-btn.primary{background:var(--rose);color:white;border-color:var(--rose)}
+    .inv-btn.primary:hover{background:var(--rose-light)}
+
+    /* INVOICE BODY — print-friendly */
+    .invoice-body{padding:32px 36px}
+    .inv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+    .inv-logo{width:80px;height:80px;object-fit:contain;border-radius:50%}
+    .inv-brand{text-align:right}
+    .inv-brand h2{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--rose)}
+    .inv-brand p{font-size:.78rem;color:var(--muted);margin-top:2px}
+    .inv-title{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .inv-id{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--dark)}
+    .inv-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;background:var(--rose-pale);border-radius:12px;padding:18px 20px;margin-bottom:24px}
+    .inv-meta-grid .im-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+    /* editable fields in invoice */
+    .inv-edit{border:none;border-bottom:1.5px dashed var(--line);background:transparent;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--dark);outline:none;width:100%;padding:2px 0;transition:border-color .2s}
+    .inv-edit:focus{border-bottom-color:var(--rose)}
+    .inv-items-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.88rem}
+    .inv-items-table th{padding:10px 12px;background:var(--dark);color:white;text-align:left;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase}
+    .inv-items-table td{padding:10px 12px;border-bottom:1px solid var(--line)}
+    .inv-items-table tr:last-child td{border-bottom:none}
+    .inv-items-table .qty-cell input{width:50px;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none}
+    .inv-items-table .qty-cell input:focus{border-color:var(--rose)}
+    .inv-totals{margin-left:auto;width:260px;font-size:.9rem}
+    .inv-totals .it-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+    .inv-totals .it-row:last-child{border-bottom:none;font-weight:700;font-size:1rem;color:var(--rose)}
+    .inv-totals .it-row input{width:90px;text-align:right;border:none;border-bottom:1.5px dashed var(--line);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);outline:none;background:transparent}
+    .inv-totals .it-row input:focus{border-bottom-color:var(--rose)}
+    .inv-notes-section{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}
+    .inv-notes-section label{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:6px}
+    .inv-notes-section textarea{width:100%;border:1.5px dashed var(--line);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--dark);resize:vertical;outline:none;min-height:70px}
+    .inv-notes-section textarea:focus{border-color:var(--rose)}
+    .inv-footer{margin-top:28px;text-align:center;font-size:.76rem;color:var(--muted);padding-top:16px;border-top:1px solid var(--line)}
+
+    @media print{
+      body>*{display:none!important}
+      #invoiceOverlay{display:block!important;position:static!important;background:none!important;padding:0!important}
+      .invoice-modal{max-height:none!important;border-radius:0!important;box-shadow:none!important}
+      .invoice-actions{display:none!important}
+      .inv-edit,.inv-totals .it-row input,.inv-items-table .qty-cell input,.inv-notes-section textarea{border:none!important;border-bottom:none!important}
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #f9f0f5;
-      color: var(--dark);
-      min-height: 100vh;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      background: var(--dark);
-      color: var(--white);
-      text-align: center;
-      padding: 36px 20px 28px;
-      position: relative;
-      overflow: hidden;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(159,42,111,0.35) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .logo-img {
-      width: 160px;
-      height: 160px;
-      object-fit: contain;
-      border-radius: 50%;
-      display: block;
-      margin: 0 auto 10px;
-      position: relative;
-      z-index: 1;
-    }
-    .tagline {
-      color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-top: 4px;
-      position: relative; z-index: 1;
-    }
-    .price-note {
-      display: inline-block;
-      margin-top: 14px;
-      padding: 6px 18px;
-      border: 1px solid rgba(201,149,76,0.45);
-      border-radius: 100px;
-      color: var(--gold);
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      position: relative; z-index: 1;
-    }
-
-    /* ── LAYOUT ── */
-    .page-wrap {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 28px 14px 130px;
-    }
-
-    /* ── CATEGORY ── */
-    .category {
-      background: var(--white);
-      border-radius: 16px;
-      box-shadow: 0 2px 16px rgba(159,42,111,0.07);
-      margin-bottom: 18px;
-      overflow: hidden;
-    }
-    .category-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 16px 22px 13px;
-      border-bottom: 1px solid var(--line);
-    }
-    .category-icon { font-size: 1.3rem; }
-    .category-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.45rem;
-      color: var(--rose);
-      font-weight: 700;
-    }
-
-    /* ── MENU ITEM ── */
-    .item {
-      display: flex;
-      align-items: center;
-      padding: 13px 22px;
-      border-bottom: 1px solid var(--line);
-      gap: 10px;
-      transition: background 0.15s;
-    }
-    .item:last-child { border-bottom: none; }
-    .item:hover { background: var(--rose-pale); }
-    .item-name {
-      flex: 1;
-      font-size: 0.92rem;
-      font-weight: 400;
-    }
-    .item-sub {
-      font-size: 0.78rem;
-      color: var(--muted);
-      display: block;
-    }
-    .item-price {
-      font-weight: 600;
-      color: var(--rose);
-      font-size: 0.88rem;
-      min-width: 80px;
-      text-align: right;
-    }
-
-    /* ── QUANTITY CONTROL ── */
-    .qty-control {
-      display: flex; align-items: center;
-      margin-left: 14px;
-      border: 1.5px solid var(--line);
-      border-radius: 100px;
-      overflow: hidden;
-      transition: border-color 0.2s;
-      flex-shrink: 0;
-    }
-    .qty-control.active { border-color: var(--rose); }
-    .qty-btn {
-      width: 32px; height: 32px;
-      background: transparent;
-      border: none;
-      color: var(--rose);
-      font-size: 1.1rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s, color 0.15s;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-    .qty-btn:hover { background: var(--rose); color: white; }
-    .qty-value {
-      min-width: 26px; text-align: center;
-      font-size: 0.88rem; font-weight: 600;
-      color: var(--dark);
-    }
-
-    /* ── FLOATING CART ── */
-    .cart-bar {
-      position: fixed; bottom: 20px; left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: var(--dark);
-      color: white;
-      padding: 15px 26px;
-      border-radius: 100px;
-      box-shadow: 0 8px 32px rgba(26,13,20,0.4), 0 0 0 1px rgba(159,42,111,0.3);
-      display: flex; align-items: center; gap: 12px;
-      cursor: pointer;
-      z-index: 1000;
-      white-space: nowrap;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
-    }
-    .cart-bar.visible { transform: translateX(-50%) translateY(0); }
-    .cart-bar:hover { box-shadow: 0 12px 40px rgba(26,13,20,0.5), 0 0 0 1px rgba(159,42,111,0.5); }
-    .cart-icon { font-size: 1.15rem; }
-    .cart-label { font-size: 0.92rem; font-weight: 500; }
-    .cart-total {
-      background: var(--rose);
-      padding: 4px 14px;
-      border-radius: 100px;
-      font-weight: 700;
-      font-size: 0.88rem;
-    }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(26,13,20,0.75);
-      z-index: 2000;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-
-    .modal {
-      background: var(--white);
-      border-radius: 24px 24px 0 0;
-      width: 100%; max-width: 560px;
-      max-height: 92vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-head {
-      position: sticky; top: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px;
-      background: var(--white);
-      border-bottom: 1px solid var(--line);
-      z-index: 10;
-    }
-    .modal-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.45rem;
-      color: var(--rose);
-      font-weight: 700;
-    }
-    .modal-close {
-      width: 34px; height: 34px;
-      background: var(--rose-pale);
-      border: none; border-radius: 50%;
-      cursor: pointer;
-      font-size: 1rem;
-      color: var(--rose);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .modal-body { padding: 18px 22px; }
-
-    /* ── ORDER SUMMARY ── */
-    .order-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .order-item:last-child { border-bottom: none; }
-    .order-name { flex: 1; font-size: 0.9rem; }
-    .order-qty {
-      font-size: 0.82rem; color: var(--muted);
-      background: var(--rose-pale);
-      padding: 2px 10px; border-radius: 100px;
-      flex-shrink: 0;
-    }
-    .order-price { font-weight: 600; min-width: 70px; text-align: right; font-size: 0.9rem; }
-    .order-total-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 0 4px;
-      margin-top: 4px;
-      border-top: 2px solid var(--line);
-    }
-    .order-total-label { font-weight: 600; font-size: 0.95rem; }
-    .order-total-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.75rem; font-weight: 700;
-      color: var(--rose);
-    }
-
-    .empty-cart {
-      text-align: center; padding: 48px 20px; color: var(--muted);
-    }
-    .empty-cart .empty-icon { font-size: 2.8rem; margin-bottom: 10px; }
-
-    /* ── FORM ── */
-    .form-field { margin-bottom: 14px; }
-    .form-field label {
-      display: block; margin-bottom: 5px;
-      font-size: 0.82rem; font-weight: 500; color: var(--mid);
-      letter-spacing: 0.04em;
-    }
-    .form-field input,
-    .form-field textarea {
-      width: 100%; padding: 11px 14px;
-      border: 1.5px solid var(--line);
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem;
-      color: var(--dark);
-      transition: border-color 0.2s;
-      outline: none;
-    }
-    .form-field input:focus,
-    .form-field textarea:focus { border-color: var(--rose); }
-
-    /* ── BUTTONS ── */
-    .btn-primary {
-      width: 100%; padding: 15px;
-      background: var(--rose); color: white;
-      border: none; border-radius: 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.98rem; font-weight: 600;
-      cursor: pointer; letter-spacing: 0.02em;
-      transition: background 0.2s, transform 0.1s;
-      margin-top: 8px;
-    }
-    .btn-primary:hover { background: var(--rose-light); }
-    .btn-primary:active { transform: scale(0.98); }
-
-    .btn-ghost {
-      width: 100%; padding: 11px;
-      background: transparent; color: var(--muted);
-      border: 1.5px solid var(--line);
-      border-radius: 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.88rem;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .btn-ghost:hover { border-color: var(--rose); color: var(--rose); }
-
-    .modal-note {
-      text-align: center;
-      font-size: 0.78rem; color: var(--muted);
-      padding: 14px 22px;
-      border-top: 1px solid var(--line);
-    }
-
-    /* ── SUCCESS ── */
-    .success-screen { text-align: center; padding: 36px 16px; }
-    .success-icon { font-size: 2.8rem; margin-bottom: 14px; }
-    .success-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.75rem; color: var(--rose); font-weight: 700; margin-bottom: 8px;
-    }
-    .success-msg { color: var(--muted); font-size: 0.92rem; line-height: 1.65; }
-
-    /* ── TRANSPORT NOTE ── */
-    .transport-note {
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(159,42,111,0.06);
-      padding: 14px 20px;
-      margin-bottom: 18px;
-      display: flex; align-items: center; gap: 12px;
-      font-size: 0.86rem; color: var(--mid);
-    }
-    .transport-note .t-icon { font-size: 1.3rem; flex-shrink: 0; }
-    .transport-note strong { color: var(--rose); }
-
-    @media (min-width: 560px) {
-      .modal { border-radius: 24px; margin: auto; }
-      .modal-overlay { align-items: center; }
-    }
+    @media(min-width:560px){.modal{border-radius:24px;margin:auto}.modal-overlay{align-items:center}}
+    @media(max-width:480px){.detail-grid{grid-template-columns:1fr}.inv-meta-grid{grid-template-columns:1fr}.inv-header{flex-direction:column;align-items:flex-start}.inv-brand{text-align:left}.inv-totals{width:100%}}
   </style>
 </head>
 <body>
 
+<!-- ═══ CUSTOMER PAGE ═══ -->
+<div id="customerPage">
   <header class="header">
-    <img src="232784.png" alt="Zilicious Catering" class="logo-img"
-         onerror="this.style.display='none'">
-    <p class="tagline">Luxury Catering &nbsp;·&nbsp; Premium Events</p>
+    <img src="232784.png" alt="Zilicious Catering" class="logo-img" onerror="this.style.display='none'">
+    <p class="tagline">Luxury Catering · Premium Events</p>
     <span class="price-note">All prices per large tray · USD</span>
   </header>
 
   <main class="page-wrap">
-
     <div class="transport-note">
-      <span class="t-icon">🚗</span>
+      <span style="font-size:1.3rem;flex-shrink:0">🚗</span>
       <span><strong>Transport:</strong> Within 20-mile radius included. Beyond 20 miles: <strong>$1 per mile</strong>.</span>
     </div>
 
     <!-- CARBS -->
     <div class="category">
       <div class="category-header"><span class="category-icon">🥖</span><span class="category-title">Carbs</span></div>
-      <div class="item"><span class="item-name">Pilau Rice</span><span class="item-price">$130</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Coconut Rice</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Plain Rice</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Bhajias</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chips Masala</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Viazi Karai</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chapo (White)</span><span class="item-price">$2 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chapo (Brown)</span><span class="item-price">$2.50 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Pilau Rice</span><span class="item-price">$130</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Coconut Rice</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Plain Rice</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Bhajias</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chips Masala</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Viazi Karai</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chapo (White)</span><span class="item-price">$2 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chapo (Brown)</span><span class="item-price">$2.50 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
 
     <!-- PROTEINS -->
     <div class="category">
       <div class="category-header"><span class="category-icon">🍖</span><span class="category-title">Proteins</span></div>
-      <div class="item"><span class="item-name">Mbuzi Wet Fry</span><span class="item-price">$300</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Goat Curry</span><span class="item-price">$280</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Beef Stew</span><span class="item-price">$260</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chicken Curry Stew</span><span class="item-price">$220</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chicken Teriyaki Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$150</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chicken Tikka Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Baked Chicken Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mbuzi Wet Fry</span><span class="item-price">$300</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Goat Curry</span><span class="item-price">$280</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Beef Stew</span><span class="item-price">$260</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Curry Stew</span><span class="item-price">$220</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Teriyaki Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$150</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Tikka Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Baked Chicken Drumsticks<span class="item-sub">40 pcs</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
 
     <!-- VEGGIES -->
     <div class="category">
       <div class="category-header"><span class="category-icon">🥦</span><span class="category-title">Veggies</span></div>
-      <div class="item"><span class="item-name">Kachumbari</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Mixed Veggies</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Creamy Spinach</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Creamy Mushrooms</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Coconut Beans</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Lentils</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Salad Platter</span><span class="item-price">$80</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Kachumbari</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mixed Veggies</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Creamy Spinach</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Creamy Mushrooms</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Coconut Beans</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Lentils</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Salad Platter</span><span class="item-price">$80</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
 
-    <!-- SNACKS N FRUITS -->
+    <!-- SNACKS -->
     <div class="category">
       <div class="category-header"><span class="category-icon">🥟</span><span class="category-title">Snacks &amp; Fruits</span></div>
-      <div class="item"><span class="item-name">Beef Samosas<span class="item-sub">50 pcs</span></span><span class="item-price">$125</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Fruit Platter</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Mahamris</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Farmers Choice Kenya Sausages</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Kebabs</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Meatpies</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Beef Samosas<span class="item-sub">50 pcs</span></span><span class="item-price">$125</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Fruit Platter</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mahamris</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Farmers Choice Kenya Sausages</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Kebabs</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Meatpies</span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
 
     <!-- KIDS -->
     <div class="category">
       <div class="category-header"><span class="category-icon">🧒</span><span class="category-title">Kids</span></div>
-      <div class="item"><span class="item-name">Chicken Nuggets</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Fries</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Pasta 'N' Meatballs</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Mac N Cheese</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chicken Nuggets</span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Fries</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Pasta 'N' Meatballs</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Mac N Cheese</span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
 
     <!-- BEVERAGES -->
     <div class="category">
       <div class="category-header"><span class="category-icon">☕</span><span class="category-title">Beverages</span></div>
-      <div class="item"><span class="item-name">Chai Masala<span class="item-sub">50 cups</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chai<span class="item-sub">50 cups</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chai Masala<span class="item-sub">50 cups</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chai<span class="item-sub">50 cups</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
 
     <!-- CHAFERS -->
     <div class="category">
       <div class="category-header"><span class="category-icon">✨</span><span class="category-title">Chafers</span></div>
-      <div class="item"><span class="item-name">Chafing Dishes (Gold Luxury)</span><span class="item-price">$15 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
-      <div class="item"><span class="item-name">Chafing Dishes (Silver)</span><span class="item-price">$10 each</span><div class="qty-control"><button class="qty-btn" onclick="changeQty(this,-1)">−</button><span class="qty-value">0</span><button class="qty-btn" onclick="changeQty(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chafing Dishes (Gold Luxury)</span><span class="item-price">$15 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chafing Dishes (Silver)</span><span class="item-price">$10 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
     </div>
-
   </main>
 
-  <!-- Floating cart bar -->
   <div class="cart-bar" id="cartBar" onclick="openModal()">
-    <span class="cart-icon">🛒</span>
-    <span class="cart-label" id="cartLabel">0 items</span>
+    <span>🛒</span>
+    <span id="cartLabel">0 items</span>
     <span class="cart-total" id="cartTotal">$0</span>
   </div>
 
-  <!-- Modal -->
+  <!-- ORDER MODAL -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal" id="modal">
+    <div class="modal">
       <div class="modal-head">
         <span class="modal-title" id="modalTitle">Your Order</span>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
-
-      <!-- Screen 1: Summary -->
       <div id="screenSummary">
         <div class="modal-body" id="summaryBody"></div>
-        <div style="padding:0 22px 8px;">
+        <div style="padding:0 22px 8px">
           <button class="btn-primary" id="proceedBtn" onclick="showForm()">Confirm Order →</button>
         </div>
-        <p class="modal-note">We'll contact you to confirm delivery &amp; payment details.</p>
+        <p class="modal-note">We'll contact you to confirm delivery &amp; payment.</p>
       </div>
-
-      <!-- Screen 2: Contact Details -->
-      <div id="screenForm" style="display:none;">
+      <div id="screenForm" style="display:none">
         <div class="modal-body">
-          <div class="form-field">
-            <label>Full Name *</label>
-            <input type="text" id="fName" placeholder="Your full name">
-          </div>
+          <div class="form-field"><label>Full Name *</label><input type="text" id="fName" placeholder="Your full name"></div>
           <div class="form-field">
             <label>Phone Number *</label>
-            <input type="tel" id="fPhone" placeholder="+254 7XX XXX XXX">
+            <div class="phone-row"><span class="phone-flag">🇺🇸 +1</span><input type="tel" id="fPhone" placeholder="(555) 000-0000" maxlength="14" oninput="fmtPhone(this)"></div>
           </div>
-          <div class="form-field">
-            <label>Event Date *</label>
-            <input type="date" id="fDate">
-          </div>
-          <div class="form-field">
-            <label>Delivery / Pickup Location</label>
-            <textarea id="fAddress" rows="2" placeholder="Address or pickup point"></textarea>
-          </div>
-          <div class="form-field">
-            <label>Additional Notes</label>
-            <textarea id="fNotes" rows="2" placeholder="Any special requests or dietary requirements"></textarea>
-          </div>
-          <button class="btn-primary" onclick="submitOrder()">Submit Order ✓</button>
+          <div class="form-field"><label>Event Date *</label><input type="date" id="fDate"></div>
+          <div class="form-field"><label>Delivery / Pickup Location</label><textarea id="fAddress" rows="2" placeholder="Street address or pickup point"></textarea></div>
+          <div class="form-field"><label>Dietary Requirements / Notes</label><textarea id="fNotes" rows="2" placeholder="e.g. nut allergy, halal only, extra spicy…"></textarea></div>
+          <button class="btn-primary" id="submitBtn" onclick="submitOrder()">Submit Order ✓</button>
           <button class="btn-ghost" onclick="showSummary()">← Back to Order</button>
         </div>
         <p class="modal-note">We'll reach out shortly to finalize everything.</p>
       </div>
-
-      <!-- Screen 3: Success -->
-      <div id="screenSuccess" style="display:none;">
+      <div id="screenSuccess" style="display:none">
         <div class="modal-body">
           <div class="success-screen">
             <div class="success-icon">👑</div>
@@ -510,130 +364,478 @@
       </div>
     </div>
   </div>
+</div><!-- /#customerPage -->
 
-  <script>
-    const cart = {};
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="adminLoginPage">
+  <div class="admin-login">
+    <div style="font-size:2rem;margin-bottom:10px">🔒</div>
+    <h2>Admin Access</h2>
+    <p>Zilicious Catering — Orders Dashboard</p>
+    <div class="form-field"><label>Password</label><input type="password" id="adminPwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <button class="btn-primary" onclick="adminLogin()">Sign In</button>
+    <p style="margin-top:14px;font-size:.8rem;color:var(--muted)"><a href="/" style="color:var(--rose)">← Back to menu</a></p>
+  </div>
+</div>
 
-    function parsePrice(priceText) {
-      return parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+<!-- ═══ ADMIN PANEL ═══ -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <div><h2>📋 Orders Dashboard</h2><p>Zilicious Catering · All submitted orders</p></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+      <button class="admin-logout" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="adminStats">
+    <div class="stat-box"><div class="stat-label">Total Orders</div><div class="stat-val" id="statOrders">—</div></div>
+    <div class="stat-box"><div class="stat-label">Total Revenue</div><div class="stat-val" id="statRevenue">—</div></div>
+    <div class="stat-box"><div class="stat-label">This Month</div><div class="stat-val" id="statMonth">—</div></div>
+    <div class="stat-box"><div class="stat-label">Next Event</div><div class="stat-val" id="statNext" style="font-size:1.1rem;padding-top:8px">—</div></div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('orders',this)">📦 Orders</button>
+    <button class="tab-btn" onclick="switchTab('report',this)">📊 Sales Report</button>
+    <button class="tab-btn" onclick="switchTab('blocked',this)">🚫 Blocked Dates</button>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div class="tab-pane active" id="tab-orders">
+    <div id="ordersContainer"></div>
+  </div>
+
+  <!-- SALES REPORT TAB -->
+  <div class="tab-pane" id="tab-report">
+    <div class="report-filter">
+      <label style="font-size:.85rem;font-weight:500;color:var(--mid)">Period:</label>
+      <select id="reportPeriod" onchange="renderReport()">
+        <option value="day">Today</option>
+        <option value="week">This Week</option>
+        <option value="month" selected>This Month</option>
+        <option value="year">This Year</option>
+      </select>
+    </div>
+    <div class="report-summary" id="reportSummary"></div>
+    <div class="report-table" id="reportTable" style="margin-top:16px"></div>
+  </div>
+
+  <!-- BLOCKED DATES TAB -->
+  <div class="tab-pane" id="tab-blocked">
+    <div class="blocked-section">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--rose)">Blocked / Booked Dates</h3>
+      <p style="font-size:.84rem;color:var(--muted);margin-top:4px">Customers won't be able to select these dates when placing an order.</p>
+      <div class="add-blocked-row">
+        <input type="date" id="blockDateInput">
+        <input type="text" id="blockNoteInput" placeholder="Reason (optional)" style="flex:2">
+        <button class="btn-add-block" onclick="addBlockedDate()">+ Block Date</button>
+      </div>
+      <div class="blocked-list" id="blockedList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INVOICE MODAL ═══ -->
+<div id="invoiceOverlay">
+  <div class="invoice-modal">
+    <div class="invoice-actions">
+      <button class="inv-btn" onclick="closeInvoice()">✕ Close</button>
+      <button class="inv-btn" onclick="window.print()">🖨 Print</button>
+      <button class="inv-btn primary" onclick="shareInvoice()">📤 Share / Copy Link</button>
+    </div>
+    <div class="invoice-body" id="invoiceBody"></div>
+  </div>
+</div>
+
+<script>
+/* ═══ CONFIG ═══ */
+const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbzJgr-TKnm1gO-_XbOKtZ3Chgq8YO3Bp0eXeD28Kwc-LNhb4Onl9VbD_AWjiGgLJd3M/exec';
+const ADMIN_PASSWORD = 'Zilicious2027';
+
+/* ═══ ROUTING ═══ */
+window.addEventListener('DOMContentLoaded', () => {
+  const isAdmin = location.search.includes('admin');
+  if (isAdmin) {
+    document.getElementById('customerPage').style.display = 'none';
+    sessionStorage.getItem('zil_admin') === '1' ? showAdminPanel() : (document.getElementById('adminLoginPage').style.display = 'block');
+  }
+  document.getElementById('fDate').addEventListener('change', validateDate);
+});
+
+/* ═══ CART ═══ */
+const cart = {};
+
+function parsePrice(t) { return parseFloat(t.replace(/[^0-9.]/g,'')) || 0; }
+
+function adj(btn, delta) {
+  const inp = btn.parentElement.querySelector('.qty-input');
+  inp.value = Math.max(0, parseInt(inp.value||0) + delta);
+  syncItem(inp);
+}
+
+function setQty(inp) {
+  inp.value = Math.max(0, parseInt(inp.value)||0);
+  syncItem(inp);
+}
+
+function syncItem(inp) {
+  const item  = inp.closest('.item');
+  const name  = item.querySelector('.item-name').childNodes[0].textContent.trim();
+  const price = parsePrice(item.querySelector('.item-price').textContent);
+  const qty   = parseInt(inp.value) || 0;
+  const ctrl  = item.querySelector('.qty-control');
+
+  if (qty > 0) cart[name] = { qty, price };
+  else delete cart[name];
+
+  ctrl.classList.toggle('active', qty > 0);
+  updateCartBar();
+}
+
+function updateCartBar() {
+  let count=0, total=0;
+  Object.values(cart).forEach(i=>{ count+=i.qty; total+=i.qty*i.price; });
+  document.getElementById('cartLabel').textContent = count===1?'1 item':`${count} items`;
+  document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('cartBar').classList.toggle('visible', count>0);
+}
+
+/* ═══ MODAL ═══ */
+function openModal(){ showSummary(); document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+function showSummary() {
+  document.getElementById('modalTitle').textContent = 'Your Order';
+  document.getElementById('screenSummary').style.display = 'block';
+  document.getElementById('screenForm').style.display = 'none';
+  document.getElementById('screenSuccess').style.display = 'none';
+  const keys = Object.keys(cart);
+  const body = document.getElementById('summaryBody');
+  if (!keys.length) {
+    body.innerHTML = `<div class="empty-cart"><div class="empty-icon">🛒</div><p>Your cart is empty.</p></div>`;
+    document.getElementById('proceedBtn').style.display='none'; return;
+  }
+  document.getElementById('proceedBtn').style.display='block';
+  let total=0, html='';
+  keys.forEach(n=>{ const {qty,price}=cart[n]; const sub=qty*price; total+=sub;
+    html+=`<div class="order-item"><span class="order-name">${n}</span><span class="order-qty">×${qty}</span><span class="order-price">$${sub.toLocaleString()}</span></div>`;
+  });
+  html+=`<div class="order-total-row"><span style="font-weight:600">Total</span><span class="order-total-value">$${total.toLocaleString()}</span></div>`;
+  body.innerHTML=html;
+}
+
+function showForm() {
+  if (!Object.keys(cart).length) return;
+  document.getElementById('modalTitle').textContent='Contact Details';
+  document.getElementById('screenSummary').style.display='none';
+  document.getElementById('screenForm').style.display='block';
+}
+
+/* ═══ PHONE FORMAT ═══ */
+function fmtPhone(i) {
+  let v=i.value.replace(/\D/g,'').slice(0,10);
+  if(v.length>=7) v=`(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+  else if(v.length>=4) v=`(${v.slice(0,3)}) ${v.slice(3)}`;
+  else if(v.length>0) v=`(${v}`;
+  i.value=v;
+}
+
+/* ═══ DATE VALIDATION (blocked dates) ═══ */
+function validateDate() {
+  const val = document.getElementById('fDate').value;
+  const blocked = JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if (blocked.find(b=>b.date===val)) {
+    alert('Sorry, that date is already booked. Please choose a different date.');
+    document.getElementById('fDate').value='';
+  }
+}
+
+/* ═══ SUBMIT ORDER ═══ */
+async function submitOrder() {
+  const name  = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const date  = document.getElementById('fDate').value;
+  if (!name||!phone||!date){ alert('Please fill in Full Name, Phone Number, and Event Date.'); return; }
+
+  const address = document.getElementById('fAddress').value.trim();
+  const notes   = document.getElementById('fNotes').value.trim();
+  let total=0;
+  const items = Object.entries(cart).map(([n,{qty,price}])=>{ total+=qty*price; return {name:n,qty,price,subtotal:qty*price}; });
+
+  const order = { id:'ORD-'+Date.now(), timestamp:new Date().toISOString(), customerName:name,
+    phone:'+1 '+phone, eventDate:date, address, notes, items, total };
+
+  const stored = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  stored.unshift(order);
+  localStorage.setItem('zil_orders', JSON.stringify(stored));
+
+  if (SHEET_URL) {
+    const btn=document.getElementById('submitBtn');
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Submitting…';
+    try { await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)}); } catch(e){}
+    btn.disabled=false; btn.innerHTML='Submit Order ✓';
+  }
+
+  const fmtDate=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('successMsg').innerHTML=`Thank you, <strong>${name}</strong>! Your order totalling <strong>$${total.toLocaleString()}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you at <strong>+1 ${phone}</strong> shortly.`;
+  document.getElementById('modalTitle').textContent='All Done!';
+  document.getElementById('screenForm').style.display='none';
+  document.getElementById('screenSuccess').style.display='block';
+
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  document.querySelectorAll('.qty-input').forEach(el=>{ el.value=0; });
+  document.querySelectorAll('.qty-control').forEach(el=>el.classList.remove('active'));
+  updateCartBar();
+}
+
+document.getElementById('modalOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('modalOverlay'))closeModal(); });
+
+/* ═══ ADMIN AUTH ═══ */
+function adminLogin() {
+  const pw=document.getElementById('adminPwInput').value;
+  if(pw===ADMIN_PASSWORD){ sessionStorage.setItem('zil_admin','1'); document.getElementById('adminLoginPage').style.display='none'; showAdminPanel(); }
+  else { document.getElementById('adminPwInput').value=''; document.getElementById('adminPwInput').placeholder='Incorrect — try again'; document.getElementById('adminPwInput').style.borderColor='#e03'; }
+}
+function adminLogout(){ sessionStorage.removeItem('zil_admin'); location.href='/?admin'; }
+
+/* ═══ ADMIN PANEL ═══ */
+function showAdminPanel() {
+  document.getElementById('adminPanel').style.display='block';
+  loadOrders();
+  renderBlockedDates();
+}
+
+function loadOrders() {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const now=new Date();
+  const thisMonth=orders.filter(o=>{ const d=new Date(o.timestamp); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const monthTotal=thisMonth.reduce((s,o)=>s+o.total,0);
+  const allTotal=orders.reduce((s,o)=>s+o.total,0);
+  document.getElementById('statOrders').textContent=orders.length;
+  document.getElementById('statRevenue').textContent=`$${allTotal.toLocaleString()}`;
+  document.getElementById('statMonth').textContent=`$${monthTotal.toLocaleString()}`;
+  const next=orders.filter(o=>new Date(o.eventDate+'T00:00:00')>=now).sort((a,b)=>new Date(a.eventDate)-new Date(b.eventDate))[0];
+  document.getElementById('statNext').textContent=next?new Date(next.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'None';
+  renderOrders(orders);
+  renderReport();
+}
+
+function renderOrders(orders) {
+  const c=document.getElementById('ordersContainer');
+  if(!orders.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">📭</div><p>No orders yet.</p></div>`; return; }
+  c.innerHTML=orders.map((o,i)=>{
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const subD=new Date(o.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card">
+      <div class="order-card-head" onclick="toggleCard(${i})">
+        <div><strong>${o.customerName}</strong><div class="order-meta">📅 Event: ${evtD} · Submitted: ${subD}</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="inv-btn" style="padding:6px 14px;font-size:.78rem" onclick="event.stopPropagation();openInvoice(${i})">🧾 Invoice</button>
+          <span class="order-badge">$${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Dietary / Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(i){ document.getElementById(`card-${i}`).classList.toggle('open'); }
+
+/* ═══ SALES REPORT ═══ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='report') renderReport();
+  if(name==='blocked') renderBlockedDates();
+}
+
+function renderReport() {
+  const period=document.getElementById('reportPeriod').value;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const now=new Date();
+
+  const filtered=orders.filter(o=>{
+    const d=new Date(o.timestamp);
+    if(period==='day') return d.toDateString()===now.toDateString();
+    if(period==='week'){
+      const wStart=new Date(now); wStart.setDate(now.getDate()-now.getDay());
+      return d>=wStart;
     }
+    if(period==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(period==='year') return d.getFullYear()===now.getFullYear();
+    return true;
+  });
 
-    function changeQty(btn, delta) {
-      const item  = btn.closest('.item');
-      const nameEl = item.querySelector('.item-name');
-      // Get just the text node, not the sub-label
-      const name  = nameEl.childNodes[0].textContent.trim();
-      const price = parsePrice(item.querySelector('.item-price').textContent);
-      const ctrl  = item.querySelector('.qty-control');
-      const span  = item.querySelector('.qty-value');
+  const totalRev=filtered.reduce((s,o)=>s+o.total,0);
+  const avgOrder=filtered.length?Math.round(totalRev/filtered.length):0;
 
-      if (!cart[name]) cart[name] = { qty: 0, price };
-      cart[name].qty = Math.max(0, cart[name].qty + delta);
-      if (cart[name].qty === 0) delete cart[name];
+  // Item breakdown
+  const itemMap={};
+  filtered.forEach(o=>o.items.forEach(it=>{
+    if(!itemMap[it.name]) itemMap[it.name]={qty:0,rev:0};
+    itemMap[it.name].qty+=it.qty; itemMap[it.name].rev+=it.subtotal;
+  }));
+  const topItems=Object.entries(itemMap).sort((a,b)=>b[1].rev-a[1].rev);
 
-      span.textContent = cart[name] ? cart[name].qty : 0;
-      ctrl.classList.toggle('active', !!(cart[name] && cart[name].qty > 0));
+  document.getElementById('reportSummary').innerHTML=`
+    <div class="rs-item"><div class="rs-label">Orders</div><div class="rs-val">${filtered.length}</div></div>
+    <div class="rs-item"><div class="rs-label">Revenue</div><div class="rs-val">$${totalRev.toLocaleString()}</div></div>
+    <div class="rs-item"><div class="rs-label">Avg Order</div><div class="rs-val">$${avgOrder.toLocaleString()}</div></div>`;
 
-      updateCartBar();
-    }
+  if(!topItems.length){ document.getElementById('reportTable').innerHTML=`<div class="no-orders" style="padding:40px"><p>No orders in this period.</p></div>`; return; }
 
-    function updateCartBar() {
-      let count = 0, total = 0;
-      Object.values(cart).forEach(i => { count += i.qty; total += i.qty * i.price; });
+  document.getElementById('reportTable').innerHTML=`<table>
+    <thead><tr><th>Item</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+    <tbody>${topItems.map(([name,{qty,rev}])=>`<tr><td>${name}</td><td>${qty}</td><td>$${rev.toLocaleString()}</td></tr>`).join('')}</tbody>
+  </table>`;
+}
 
-      document.getElementById('cartLabel').textContent = count === 1 ? '1 item' : `${count} items`;
-      document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
-      document.getElementById('cartBar').classList.toggle('visible', count > 0);
-    }
+/* ═══ BLOCKED DATES ═══ */
+function addBlockedDate() {
+  const date=document.getElementById('blockDateInput').value;
+  const note=document.getElementById('blockNoteInput').value.trim();
+  if(!date){ alert('Please select a date.'); return; }
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if(blocked.find(b=>b.date===date)){ alert('That date is already blocked.'); return; }
+  blocked.push({date,note});
+  blocked.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked));
+  document.getElementById('blockDateInput').value='';
+  document.getElementById('blockNoteInput').value='';
+  renderBlockedDates();
+}
 
-    function openModal() {
-      showSummary();
-      document.getElementById('modalOverlay').classList.add('open');
-    }
+function removeBlockedDate(date) {
+  let blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  blocked=blocked.filter(b=>b.date!==date);
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked));
+  renderBlockedDates();
+}
 
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('open');
-    }
+function renderBlockedDates() {
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  const list=document.getElementById('blockedList');
+  if(!blocked.length){ list.innerHTML=`<p style="color:var(--muted);font-size:.85rem;margin-top:10px">No dates blocked yet.</p>`; return; }
+  list.innerHTML=blocked.map(b=>{
+    const fmt=new Date(b.date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="blocked-row">
+      <div><div class="bd-date">${fmt}</div>${b.note?`<div class="bd-note">${b.note}</div>`:''}</div>
+      <button class="btn-del" onclick="removeBlockedDate('${b.date}')">✕</button>
+    </div>`;
+  }).join('');
+}
 
-    function showSummary() {
-      document.getElementById('modalTitle').textContent = 'Your Order';
-      document.getElementById('screenSummary').style.display = 'block';
-      document.getElementById('screenForm').style.display = 'none';
-      document.getElementById('screenSuccess').style.display = 'none';
+/* ═══ INVOICE ═══ */
+function openInvoice(idx) {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const o=orders[idx];
+  if(!o) return;
+  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
-      const body = document.getElementById('summaryBody');
-      const keys = Object.keys(cart);
+  let subtotal=o.total;
+  const itemRows=o.items.map((it,i)=>`
+    <tr>
+      <td>${it.name}</td>
+      <td class="qty-cell"><input type="number" value="${it.qty}" min="1" data-price="${it.price}" oninput="recalcInvoice()" id="invQty${i}"></td>
+      <td>$${it.price.toLocaleString()}</td>
+      <td id="invSub${i}">$${it.subtotal.toLocaleString()}</td>
+    </tr>`).join('');
 
-      if (keys.length === 0) {
-        body.innerHTML = `<div class="empty-cart"><div class="empty-icon">🛒</div><p>Your cart is empty.<br>Add items from the menu above.</p></div>`;
-        document.getElementById('proceedBtn').style.display = 'none';
-        return;
-      }
+  document.getElementById('invoiceBody').innerHTML=`
+    <div class="inv-header">
+      <div>
+        <div class="inv-title">Invoice</div>
+        <div class="inv-id">${o.id}</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Issued: ${subDate}</div>
+      </div>
+      <div class="inv-brand">
+        <img src="232784.png" class="inv-logo" onerror="this.style.display='none'">
+        <h2>Zilicious Catering</h2>
+        <p>Luxury Catering · Premium Events</p>
+      </div>
+    </div>
 
-      document.getElementById('proceedBtn').style.display = 'block';
-      let grandTotal = 0;
-      let html = '';
+    <div class="inv-meta-grid">
+      <div><div class="im-label">Billed To</div><input class="inv-edit" value="${o.customerName}" placeholder="Customer name"></div>
+      <div><div class="im-label">Phone</div><input class="inv-edit" value="${o.phone}" placeholder="Phone"></div>
+      <div><div class="im-label">Event Date</div><input class="inv-edit" value="${evtDate}" placeholder="Event date"></div>
+      <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" value="${o.address||''}" placeholder="Location"></div>
+    </div>
 
-      keys.forEach(name => {
-        const { qty, price } = cart[name];
-        const sub = qty * price;
-        grandTotal += sub;
-        html += `
-          <div class="order-item">
-            <span class="order-name">${name}</span>
-            <span class="order-qty">× ${qty}</span>
-            <span class="order-price">$${sub.toLocaleString()}</span>
-          </div>`;
-      });
+    <table class="inv-items-table" id="invTable">
+      <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
 
-      html += `
-        <div class="order-total-row">
-          <span class="order-total-label">Total</span>
-          <span class="order-total-value">$${grandTotal.toLocaleString()}</span>
-        </div>`;
+    <div style="display:flex;justify-content:flex-end">
+      <div class="inv-totals" id="invTotals">
+        <div class="it-row"><span>Subtotal</span><span id="invSubtotal">$${subtotal.toLocaleString()}</span></div>
+        <div class="it-row"><span>Transport / Extra Fees</span><input type="number" id="invTransport" value="0" min="0" placeholder="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>Discount</span><input type="number" id="invDiscount" value="0" min="0" placeholder="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>TOTAL DUE</span><span id="invGrandTotal">$${subtotal.toLocaleString()}</span></div>
+      </div>
+    </div>
 
-      body.innerHTML = html;
-    }
+    <div class="inv-notes-section">
+      <label>Special Dietary Concerns / Notes</label>
+      <textarea placeholder="Any dietary requirements, allergies, or special instructions for this event…">${o.notes||''}</textarea>
+    </div>
+    <div class="inv-notes-section" style="margin-top:12px">
+      <label>Additional Terms / Message to Client</label>
+      <textarea placeholder="e.g. 50% deposit required to confirm booking. Balance due on event day.">50% deposit required to confirm booking. Balance due on event day. Thank you for choosing Zilicious Catering!</textarea>
+    </div>
 
-    function showForm() {
-      if (Object.keys(cart).length === 0) return;
-      document.getElementById('modalTitle').textContent = 'Contact Details';
-      document.getElementById('screenSummary').style.display = 'none';
-      document.getElementById('screenForm').style.display = 'block';
-    }
+    <div class="inv-footer">
+      Zilicious Catering · Luxury Catering &amp; Premium Events<br>
+      Thank you for your business!
+    </div>`;
 
-    function submitOrder() {
-      const name  = document.getElementById('fName').value.trim();
-      const phone = document.getElementById('fPhone').value.trim();
-      const date  = document.getElementById('fDate').value;
+  document.getElementById('invoiceOverlay').classList.add('open');
+}
 
-      if (!name || !phone || !date) {
-        alert('Please fill in your Full Name, Phone Number, and Event Date.');
-        return;
-      }
+function recalcInvoice() {
+  // Recalc row subtotals
+  document.querySelectorAll('#invTable tbody tr').forEach((row,i)=>{
+    const qtyInp=row.querySelector('input[type=number]');
+    const price=parseFloat(qtyInp.dataset.price)||0;
+    const qty=parseInt(qtyInp.value)||0;
+    const sub=qty*price;
+    row.querySelector(`#invSub${i}`).textContent='$'+sub.toLocaleString();
+  });
+  // Sum subtotals
+  let subtotal=0;
+  document.querySelectorAll('#invTable tbody tr').forEach((row,i)=>{
+    const qtyInp=row.querySelector('input[type=number]');
+    subtotal+=(parseInt(qtyInp.value)||0)*(parseFloat(qtyInp.dataset.price)||0);
+  });
+  const transport=parseFloat(document.getElementById('invTransport').value)||0;
+  const discount=parseFloat(document.getElementById('invDiscount').value)||0;
+  const grand=subtotal+transport-discount;
+  document.getElementById('invSubtotal').textContent='$'+subtotal.toLocaleString();
+  document.getElementById('invGrandTotal').textContent='$'+Math.max(0,grand).toLocaleString();
+}
 
-      const total = document.getElementById('cartTotal').textContent;
-      const fmtDate = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', {
-        weekday:'long', day:'numeric', month:'long', year:'numeric'
-      });
+function closeInvoice(){ document.getElementById('invoiceOverlay').classList.remove('open'); }
 
-      document.getElementById('successMsg').innerHTML =
-        `Thank you, <strong>${name}</strong>! Your order totalling <strong>${total}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you on <strong>${phone}</strong> shortly to confirm all details and arrange delivery or pickup.`;
-
-      document.getElementById('modalTitle').textContent = 'All Done!';
-      document.getElementById('screenForm').style.display = 'none';
-      document.getElementById('screenSuccess').style.display = 'block';
-
-      // Reset cart
-      Object.keys(cart).forEach(k => delete cart[k]);
-      document.querySelectorAll('.qty-value').forEach(el => el.textContent = '0');
-      document.querySelectorAll('.qty-control').forEach(el => el.classList.remove('active'));
-      updateCartBar();
-    }
-
-    document.getElementById('modalOverlay').addEventListener('click', e => {
-      if (e.target === document.getElementById('modalOverlay')) closeModal();
-    });
-  </script>
+function shareInvoice() {
+  const url=location.href;
+  if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>alert('Page URL copied! Share this link with your client, or use the Print button to save as PDF.')); }
+  else { alert('Use the Print button (🖨) to save the invoice as a PDF, then share that file.'); }
+}
+</script>
 </body>
 </html>
