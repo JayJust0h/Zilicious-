@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zilicious Catering</title>
+  <meta name="description" content="Zilicious Catering — Luxury Catering & Premium Events. Order online.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+  <style>
+    :root{--rose:#9f2a6f;--rose-light:#c4528a;--rose-pale:#fdf0f7;--gold:#c9954c;--dark:#1a0d14;--mid:#5a3a4a;--muted:#9e8090;--line:#ecdde6;--white:#fff;--bg:#f9f0f5;--card:#fff;--input-bg:#fff;--text:#1a0d14;--shadow:rgba(159,42,111,.07)}
+    [data-theme="dark"]{--rose:#d46aaa;--rose-light:#e080bb;--rose-pale:#2a1020;--gold:#d4a55a;--dark:#f0d8e8;--mid:#c4a0b8;--muted:#8a6878;--line:#3a1828;--white:#1a0a14;--bg:#0f0610;--card:#1a0a14;--input-bg:#220d1a;--text:#f0d8e8;--shadow:rgba(0,0,0,.3)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+
+    /* DARK MODE TOGGLE */
+    .dm-toggle{position:fixed;top:14px;right:14px;z-index:1500;width:40px;height:40px;border-radius:50%;background:rgba(26,13,20,.7);backdrop-filter:blur(8px);border:1px solid rgba(159,42,111,.3);color:white;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s}
+    .dm-toggle:hover{background:var(--rose);transform:scale(1.1)}
+
+    /* HEADER */
+    .header{background:var(--dark);color:var(--white);text-align:center;padding:36px 20px 28px;position:relative;overflow:hidden}
+    .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(159,42,111,.35) 0%,transparent 70%);pointer-events:none}
+    .logo-img{width:150px;height:150px;object-fit:contain;border-radius:50%;display:block;margin:0 auto 10px;position:relative;z-index:1}
+    .tagline{color:var(--muted);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;margin-top:4px;position:relative;z-index:1}
+    .price-note{display:inline-block;margin-top:14px;padding:6px 18px;border:1px solid rgba(201,149,76,.45);border-radius:100px;color:var(--gold);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;position:relative;z-index:1}
+
+    /* LAYOUT */
+    .page-wrap{max-width:860px;margin:0 auto;padding:28px 14px 130px}
+
+    /* CATEGORY */
+    .category{background:var(--card);border-radius:16px;box-shadow:0 2px 16px var(--shadow);margin-bottom:18px;overflow:hidden;transition:background .3s}
+    .category-header{display:flex;align-items:center;gap:10px;padding:16px 22px 13px;border-bottom:1px solid var(--line)}
+    .category-icon{font-size:1.3rem}
+    .category-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;color:var(--rose);font-weight:700}
+
+    /* MENU ITEM */
+    .item{display:flex;align-items:center;padding:11px 22px;border-bottom:1px solid var(--line);gap:10px;transition:background .15s}
+    .item:last-child{border-bottom:none}
+    .item:hover{background:var(--rose-pale)}
+    .item-name{flex:1;font-size:.9rem;font-weight:400}
+    .item-sub{font-size:.76rem;color:var(--muted);display:block}
+    .item-desc{font-size:.76rem;color:var(--muted);display:block;margin-top:3px;line-height:1.45;max-width:420px}
+    .item-img{width:62px;height:62px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--line);cursor:zoom-in;transition:transform .2s,border-color .2s;loading:lazy}
+    .item:hover .item-img{transform:scale(1.07);border-color:var(--rose)}
+    .item-price{font-weight:600;color:var(--rose);font-size:.86rem;min-width:72px;text-align:right}
+
+    /* IMAGE LIGHTBOX */
+    .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:5000;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+    .lightbox.open{display:flex;animation:fadeIn .2s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .lightbox-img{max-width:min(480px,90vw);max-height:78vh;border-radius:20px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:default}
+    .lightbox-name{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:white;font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;text-align:center;text-shadow:0 2px 10px rgba(0,0,0,.8);white-space:nowrap}
+    .lightbox-close{position:absolute;top:16px;right:16px;width:40px;height:40px;background:rgba(255,255,255,.15);border:none;border-radius:50%;color:white;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .lightbox-close:hover{background:rgba(255,255,255,.3)}
+
+    /* QR CODE */
+    .qr-section{background:var(--card);border-radius:16px;box-shadow:0 2px 16px var(--shadow);padding:24px;text-align:center;margin-bottom:18px}
+    .qr-section h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--rose);margin-bottom:4px}
+    .qr-section p{font-size:.82rem;color:var(--muted);margin-bottom:16px}
+    #qrCanvas{border-radius:12px}
+    .qr-download{display:inline-block;margin-top:12px;padding:8px 20px;background:var(--rose);color:white;border-radius:100px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:background .2s}
+    .qr-download:hover{background:var(--rose-light)}
+
+    /* QTY CONTROL */
+    .qty-control{display:flex;align-items:center;margin-left:10px;border:1.5px solid var(--line);border-radius:100px;overflow:hidden;transition:border-color .2s;flex-shrink:0}
+    .qty-control.active{border-color:var(--rose)}
+    .qty-btn{width:30px;height:30px;background:transparent;border:none;color:var(--rose);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;line-height:1}
+    .qty-btn:hover{background:var(--rose);color:white}
+    .qty-input{width:38px;height:30px;border:none;text-align:center;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:var(--text);background:transparent;outline:none;-moz-appearance:textfield}
+    .qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+    /* CART BAR */
+    .cart-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:var(--white);padding:15px 26px;border-radius:100px;box-shadow:0 8px 32px rgba(26,13,20,.4),0 0 0 1px rgba(159,42,111,.3);display:flex;align-items:center;gap:12px;cursor:pointer;z-index:1000;white-space:nowrap;transition:transform .4s cubic-bezier(.175,.885,.32,1.275),box-shadow .2s}
+    .cart-bar.visible{transform:translateX(-50%) translateY(0)}
+    .cart-bar:hover{box-shadow:0 12px 40px rgba(26,13,20,.5),0 0 0 1px rgba(159,42,111,.5)}
+    .cart-total{background:var(--rose);padding:4px 14px;border-radius:100px;font-weight:700;font-size:.88rem}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,13,20,.75);z-index:2000;align-items:flex-end;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.175,.885,.32,1.275)}
+    @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:var(--card);border-bottom:1px solid var(--line);z-index:10}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.45rem;color:var(--rose);font-weight:700}
+    .modal-close{width:34px;height:34px;background:var(--rose-pale);border:none;border-radius:50%;cursor:pointer;font-size:1rem;color:var(--rose);display:flex;align-items:center;justify-content:center}
+    .modal-body{padding:18px 22px}
+
+    /* ORDER SUMMARY */
+    .order-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+    .order-item:last-child{border-bottom:none}
+    .order-name{flex:1;font-size:.9rem}
+    .order-qty{font-size:.8rem;color:var(--muted);background:var(--rose-pale);padding:2px 10px;border-radius:100px;flex-shrink:0}
+    .order-price{font-weight:600;min-width:70px;text-align:right;font-size:.9rem}
+    .order-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0 4px;margin-top:4px;border-top:2px solid var(--line)}
+    .order-total-value{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;color:var(--rose)}
+    .empty-cart{text-align:center;padding:48px 20px;color:var(--muted)}
+    .empty-icon{font-size:2.8rem;margin-bottom:10px}
+
+    /* FORM */
+    .form-field{margin-bottom:14px}
+    .form-field label{display:block;margin-bottom:5px;font-size:.82rem;font-weight:500;color:var(--mid);letter-spacing:.04em}
+    .form-field input,.form-field textarea,.form-field select{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);transition:border-color .2s;outline:none;background:var(--input-bg)}
+    .form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--rose)}
+    .phone-row{display:flex;gap:8px}
+    .phone-flag{display:flex;align-items:center;gap:6px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:.9rem;white-space:nowrap;color:var(--mid);background:var(--rose-pale);flex-shrink:0}
+    .phone-row input{flex:1}
+
+    /* BUTTONS */
+    .btn-primary{width:100%;padding:15px;background:var(--rose);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.98rem;font-weight:600;cursor:pointer;letter-spacing:.02em;transition:background .2s,transform .1s;margin-top:8px}
+    .btn-primary:hover{background:var(--rose-light)}
+    .btn-primary:active{transform:scale(.98)}
+    .btn-primary:disabled{background:var(--muted);cursor:not-allowed;transform:none}
+    .btn-ghost{width:100%;padding:11px;background:transparent;color:var(--muted);border:1.5px solid var(--line);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;margin-top:8px;transition:border-color .2s,color .2s}
+    .btn-ghost:hover{border-color:var(--rose);color:var(--rose)}
+    .modal-note{text-align:center;font-size:.78rem;color:var(--muted);padding:14px 22px;border-top:1px solid var(--line)}
+
+    /* SUCCESS */
+    .success-screen{text-align:center;padding:36px 16px}
+    .success-icon{font-size:2.8rem;margin-bottom:14px}
+    .success-title{font-family:'Cormorant Garamond',serif;font-size:1.75rem;color:var(--rose);font-weight:700;margin-bottom:8px}
+    .success-msg{color:var(--muted);font-size:.92rem;line-height:1.65}
+
+    /* TRANSPORT NOTE */
+    .transport-note{background:var(--card);border-radius:12px;box-shadow:0 2px 12px var(--shadow);padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:12px;font-size:.86rem;color:var(--mid)}
+    .transport-note strong{color:var(--rose)}
+
+    /* SPINNER */
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── ADMIN ── */
+    #adminPanel{display:none;max-width:980px;margin:0 auto;padding:24px 14px 60px}
+    .admin-header{background:var(--dark);color:var(--white);padding:24px 26px;border-radius:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .admin-header h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem}
+    .admin-header p{color:var(--muted);font-size:.8rem;margin-top:2px}
+    .admin-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .tab-btn{padding:9px 20px;border-radius:100px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s;font-weight:500}
+    .tab-btn.active{background:var(--rose);color:white;border-color:var(--rose)}
+    .tab-pane{display:none}.tab-pane.active{display:block}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+    .stat-box{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:0 2px 12px var(--shadow)}
+    .stat-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+    .stat-val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--rose);font-weight:700;margin-top:2px}
+    .report-filter{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+    .report-filter select{padding:9px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);background:var(--card);outline:none;cursor:pointer}
+    .report-filter select:focus{border-color:var(--rose)}
+    .report-table{width:100%;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px var(--shadow)}
+    .report-table table{width:100%;border-collapse:collapse}
+    .report-table th{background:var(--rose);color:white;padding:12px 16px;text-align:left;font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+    .report-table td{padding:12px 16px;border-bottom:1px solid var(--line);font-size:.88rem;color:var(--text)}
+    .report-table tr:last-child td{border-bottom:none}
+    .report-table tr:hover td{background:var(--rose-pale)}
+    .report-summary{background:var(--rose-pale);border-radius:12px;padding:16px 20px;margin-top:14px;display:flex;gap:24px;flex-wrap:wrap}
+    .report-summary .rs-item .rs-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .report-summary .rs-item .rs-val{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--rose);font-weight:700}
+    .order-card{background:var(--card);border-radius:14px;margin-bottom:12px;box-shadow:0 2px 12px var(--shadow);overflow:hidden}
+    .order-card-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:15px 20px;border-bottom:1px solid var(--line);cursor:pointer}
+    .order-card-head:hover{background:var(--rose-pale)}
+    .order-meta{font-size:.8rem;color:var(--muted);margin-top:2px}
+    .order-card-body{padding:16px 20px;display:none}.order-card-body.open{display:block}
+    .order-badge{background:var(--rose);color:white;border-radius:100px;padding:4px 14px;font-size:.8rem;font-weight:600;white-space:nowrap}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:14px}
+    .dl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+    .dv{font-size:.9rem;font-weight:500}
+    .order-items-list{background:var(--rose-pale);border-radius:10px;padding:12px 14px;font-size:.86rem}
+    .order-items-list div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)}
+    .order-items-list div:last-child{border-bottom:none;font-weight:700;color:var(--rose)}
+    .blocked-section{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 2px 12px var(--shadow)}
+    .blocked-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+    .blocked-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--rose-pale);border-radius:10px;font-size:.9rem}
+    .blocked-row .bd-date{font-weight:600}.blocked-row .bd-note{color:var(--muted);font-size:.82rem}
+    .btn-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.1rem;padding:2px 6px;border-radius:6px;transition:color .2s,background .2s}
+    .btn-del:hover{color:#e03;background:#fee}
+    .add-blocked-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .add-blocked-row input{flex:1;min-width:140px;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--input-bg);color:var(--text)}
+    .add-blocked-row input:focus{border-color:var(--rose)}
+    .btn-add-block{padding:10px 20px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap}
+    .btn-add-block:hover{background:var(--rose-light)}
+    /* CONTACTS */
+    .contacts-section{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 2px 12px var(--shadow);margin-bottom:14px}
+    .contacts-section h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--rose);margin-bottom:4px}
+    .contacts-section p{font-size:.84rem;color:var(--muted);margin-bottom:16px}
+    .contacts-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:14px}
+    .contacts-table th{background:var(--rose);color:white;padding:10px 12px;text-align:left;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase}
+    .contacts-table td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--text)}
+    .contacts-table tr:last-child td{border-bottom:none}
+    .contacts-table tr:hover td{background:var(--rose-pale)}
+    .voided-tag{background:#888;color:white;border-radius:100px;padding:2px 8px;font-size:.72rem;font-weight:600;margin-left:6px}
+    .export-btns{display:flex;gap:8px;flex-wrap:wrap}
+    .export-btn{padding:9px 18px;border-radius:10px;border:1.5px solid var(--rose);color:var(--rose);background:transparent;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s}
+    .export-btn:hover{background:var(--rose);color:white}
+    #adminLoginPage{display:none;background:var(--bg);min-height:100vh}
+    .admin-login{max-width:360px;margin:80px auto;background:var(--card);border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 8px 32px var(--shadow)}
+    .admin-login h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--rose);margin-bottom:6px}
+    .admin-login p{color:var(--muted);font-size:.85rem;margin-bottom:24px}
+    .admin-logout{background:transparent;border:1.5px solid rgba(255,255,255,.2);color:white;padding:8px 18px;border-radius:100px;cursor:pointer;font-size:.82rem;transition:border-color .2s}
+    .admin-logout:hover{border-color:white}
+    .refresh-btn{background:var(--rose);color:white;border:none;padding:10px 20px;border-radius:100px;cursor:pointer;font-size:.85rem;font-weight:600;transition:background .2s}
+    .refresh-btn:hover{background:var(--rose-light)}
+    .no-orders{text-align:center;padding:60px 20px;color:var(--muted)}
+    .order-card.voided{opacity:.75}
+    .order-card.voided .order-card-head{background:repeating-linear-gradient(135deg,var(--rose-pale),var(--rose-pale) 10px,var(--card) 10px,var(--card) 20px)}
+    .badge-voided{background:#888;color:white;border-radius:100px;padding:4px 12px;font-size:.78rem;font-weight:600;white-space:nowrap}
+    .void-reason{font-size:.8rem;color:#c0392b;margin-top:6px;font-style:italic}
+    .btn-void{padding:6px 14px;font-size:.78rem;border:1.5px solid #e03;color:#e03;background:transparent;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+    .btn-void:hover{background:#e03;color:white}
+    .btn-restore{padding:6px 14px;font-size:.78rem;border:1.5px solid var(--muted);color:var(--muted);background:transparent;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+    .btn-restore:hover{border-color:var(--rose);color:var(--rose)}
+
+    /* INVOICE MODAL */
+    #invoiceOverlay{display:none;position:fixed;inset:0;background:rgba(26,13,20,.8);z-index:3000;align-items:center;justify-content:center;padding:16px}
+    #invoiceOverlay.open{display:flex}
+    .invoice-modal{background:white;border-radius:20px;width:100%;max-width:680px;max-height:95vh;overflow-y:auto;animation:slideUp .3s ease}
+    .invoice-actions{display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    .inv-btn{padding:9px 18px;border-radius:10px;border:1.5px solid var(--line);background:white;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;font-weight:500;transition:all .2s}
+    .inv-btn:hover{border-color:var(--rose);color:var(--rose)}
+    .inv-btn.primary{background:var(--rose);color:white;border-color:var(--rose)}
+    .inv-btn.primary:hover{background:var(--rose-light)}
+
+    /* INVOICE BODY — print-friendly */
+    .invoice-body{padding:32px 36px}
+    .inv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+    .inv-logo{width:80px;height:80px;object-fit:contain;border-radius:50%}
+    .inv-brand{text-align:right}
+    .inv-brand h2{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--rose)}
+    .inv-brand p{font-size:.78rem;color:var(--muted);margin-top:2px}
+    .inv-title{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .inv-id{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--dark)}
+    .inv-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;background:var(--rose-pale);border-radius:12px;padding:18px 20px;margin-bottom:24px}
+    .inv-meta-grid .im-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+    /* editable fields in invoice */
+    .inv-edit{border:none;border-bottom:1.5px dashed var(--line);background:transparent;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--dark);outline:none;width:100%;padding:2px 0;transition:border-color .2s}
+    .inv-edit:focus{border-bottom-color:var(--rose)}
+    .inv-items-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.88rem}
+    .inv-items-table th{padding:10px 12px;background:var(--dark);color:white;text-align:left;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase}
+    .inv-items-table td{padding:10px 12px;border-bottom:1px solid var(--line)}
+    .inv-items-table tr:last-child td{border-bottom:none}
+    .inv-items-table .qty-cell input{width:50px;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none}
+    .inv-items-table .qty-cell input:focus{border-color:var(--rose)}
+    .inv-totals{margin-left:auto;width:260px;font-size:.9rem}
+    .inv-totals .it-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+    .inv-totals .it-row:last-child{border-bottom:none;font-weight:700;font-size:1rem;color:var(--rose)}
+    .inv-totals .it-row input{width:90px;text-align:right;border:none;border-bottom:1.5px dashed var(--line);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);outline:none;background:transparent}
+    .inv-totals .it-row input:focus{border-bottom-color:var(--rose)}
+    .inv-notes-section{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}
+    .inv-notes-section label{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:6px}
+    .inv-notes-section textarea{width:100%;border:1.5px dashed var(--line);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--dark);resize:vertical;outline:none;min-height:70px}
+    .inv-notes-section textarea:focus{border-color:var(--rose)}
+    .inv-footer{margin-top:28px;text-align:center;font-size:.76rem;color:var(--muted);padding-top:16px;border-top:1px solid var(--line)}
+
+    @media print{
+      body>*{display:none!important}
+      #invoiceOverlay{display:block!important;position:static!important;background:none!important;padding:0!important}
+      .invoice-modal{max-height:none!important;border-radius:0!important;box-shadow:none!important}
+      .invoice-actions{display:none!important}
+      .inv-edit,.inv-totals .it-row input,.inv-items-table .qty-cell input,.inv-notes-section textarea{border:none!important;border-bottom:none!important}
+    }
+
+    @media(min-width:560px){.modal{border-radius:24px;margin:auto}.modal-overlay{align-items:center}}
+    @media(max-width:480px){.detail-grid{grid-template-columns:1fr}.inv-meta-grid{grid-template-columns:1fr}.inv-header{flex-direction:column;align-items:flex-start}.inv-brand{text-align:left}.inv-totals{width:100%}}
+  </style>
+</head>
+<body>
+
+<!-- DARK MODE TOGGLE -->
+<button class="dm-toggle" id="dmToggle" title="Toggle dark mode">🌙</button>
+
+<!-- IMAGE LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="" onclick="event.stopPropagation()">
+  <div class="lightbox-name" id="lightboxName"></div>
+</div>
+
+<!-- ═══ CUSTOMER PAGE ═══ -->
+<div id="customerPage">
+  <header class="header">
+    <img src="232784.png" alt="Zilicious Catering" class="logo-img" onerror="this.style.display='none'">
+    <p class="tagline">Luxury Catering · Premium Events</p>
+    <span class="price-note">All prices per large tray · USD</span>
+  </header>
+
+  <main class="page-wrap">
+    <div class="transport-note">
+      <span style="font-size:1.3rem;flex-shrink:0">🚗</span>
+      <span><strong>Transport:</strong> Within 20-mile radius included. Beyond 20 miles: <strong>$1 per mile</strong>.</span>
+    </div>
+
+    <!-- QR CODE -->
+    <div class="qr-section">
+      <h3>📲 Share Our Menu</h3>
+      <p>Scan to open or share this menu with your guests</p>
+      <canvas id="qrCanvas"></canvas><br>
+      <button class="qr-download" onclick="downloadQR()">⬇ Download QR Code</button>
+    </div>
+
+    <!-- CARBS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🥖</span><span class="category-title">Carbs</span></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-pilau.jpg" alt="Pilau Rice"><span class="item-name">Pilau Rice<span class="item-desc">A flavorful spiced rice dish that combines aromatic spices with beef or chicken.</span></span><span class="item-price">$130</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-coconut-rice.jpg" alt="Coconut Rice"><span class="item-name">Coconut Rice<span class="item-desc">Also known as "Wali wa Nazi," a delicious and fragrant rice dish cooked with coconut milk and coconut flakes.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-plain-rice.jpg" alt="Plain Rice"><span class="item-name">Plain Rice<span class="item-desc">Fluffy long grain rice with a scent of rose water.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-bhajias.jpg" alt="Bhajias"><span class="item-name">Bhajias<span class="item-desc">Thinly sliced potatoes coated in a seasoned gram flour batter and deep-fried until golden and crispy.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chips-masala.jpg" alt="Chips Masala"><span class="item-name">Chips Masala<span class="item-desc">Crispy fries seasoned in a sauce blend of masala spices and cilantro.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-viazi-karai.jpg" alt="Viazi Karai"><span class="item-name">Viazi Karai<span class="item-desc">A beloved coastal Kenyan street food made from deep-fried, spiced potatoes.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chapo-white.jpg" alt="Chapo White"><span class="item-name">Chapo (White)<span class="item-desc">A popular, soft and flaky Kenyan flatbread known for its layered texture and slightly chewy consistency.</span></span><span class="item-price">$2 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chapo-brown.jpg" alt="Chapo Brown"><span class="item-name">Chapo (Brown)<span class="item-desc">Kenyan-style flatbread made using brown (whole wheat) flour.</span></span><span class="item-price">$2.50 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+
+    <!-- PROTEINS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🍖</span><span class="category-title">Proteins</span></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-mbuzi.jpg" alt="Mbuzi Wet Fry"><span class="item-name">Mbuzi Wet Fry<span class="item-desc">A Kenyan delicacy of tender goat meat cooked in a rich, spiced gravy with vegetables.</span></span><span class="item-price">$300</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-goat-curry.jpg" alt="Goat Curry"><span class="item-name">Goat Curry<span class="item-desc">A rich, flavorful dish of tender goat meat simmered in a spiced curry sauce.</span></span><span class="item-price">$280</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-beef-stew.jpg" alt="Beef Stew"><span class="item-name">Beef Stew<span class="item-desc">A hearty Kenyan beef stew with rich, savory broth, tender chunks of beef, vegetables and aromatic spices.</span></span><span class="item-price">$260</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-curry.jpg" alt="Chicken Curry"><span class="item-name">Chicken Curry Stew<span class="item-desc">Tender chicken pieces simmered in a flavorful, aromatic curry sauce.</span></span><span class="item-price">$220</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-teriyaki.jpg" alt="Chicken Teriyaki"><span class="item-name">Chicken Teriyaki Drumsticks<span class="item-sub">40 pcs</span><span class="item-desc">A popular Japanese-inspired dish with sweet and savory glazed drumsticks.</span></span><span class="item-price">$150</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-tikka.jpg" alt="Chicken Tikka"><span class="item-name">Chicken Tikka Drumsticks<span class="item-sub">40 pcs</span><span class="item-desc">A classic Indian-inspired dish with vibrant reddish-orange, tender and juicy meat with slightly charred edges.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-baked-chicken.jpg" alt="Baked Chicken"><span class="item-name">Baked Chicken Drumsticks<span class="item-sub">40 pcs</span><span class="item-desc">Crispy, golden-brown skin with tender, juicy meat seasoned with herbs and spices.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+
+    <!-- VEGGIES -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🥦</span><span class="category-title">Veggies</span></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-kachumbari.jpg" alt="Kachumbari"><span class="item-name">Kachumbari<span class="item-desc">A fresh and vibrant tomato, onion, cilantro and jalapeño salsa commonly served as a side dish.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-mixed-veggies.jpg" alt="Mixed Veggies"><span class="item-name">Mixed Veggies<span class="item-desc">A colorful and nutritious saucy dish combining various vegetables cooked together.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-creamy-spinach.jpg" alt="Creamy Spinach"><span class="item-name">Creamy Spinach<span class="item-desc">Fresh spinach cooked in a velvety, smooth sauce made with cream, butter and seasonings.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-creamy-mushrooms.jpg" alt="Creamy Mushrooms"><span class="item-name">Creamy Mushrooms<span class="item-desc">Fresh mushrooms sautéed in butter and finished in a rich, velvety cream-based sauce.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-coconut-beans.jpg" alt="Coconut Beans"><span class="item-name">Coconut Beans<span class="item-desc">Also known as "Maharagwe ya Nazi," beans cooked in a rich, creamy coconut milk sauce.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-lentils.jpg" alt="Lentils"><span class="item-name">Lentils<span class="item-desc">A hearty and nutritious lentil stew with vegetables and broth, seasoned with herbs and spices.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-salad-platter.jpg" alt="Salad Platter"><span class="item-name">Salad Platter<span class="item-desc">A diverse assortment of various fresh vegetables.</span></span><span class="item-price">$80</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+
+    <!-- SNACKS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🥟</span><span class="category-title">Snacks &amp; Fruits</span></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-samosas.jpg" alt="Beef Samosas"><span class="item-name">Beef Samosas<span class="item-sub">50 pcs</span><span class="item-desc">Savory pastries filled with a flavorful mixture of spiced meat and vegetables, encased in a crispy pastry shell.</span></span><span class="item-price">$125</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-fruit-platter.jpg" alt="Fruit Platter"><span class="item-name">Fruit Platter<span class="item-desc">A delightful and refreshing colorful dish that combines a variety of seasonal fresh fruits.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-mahamris.jpg" alt="Mahamris"><span class="item-name">Mahamris<span class="item-desc">Kenyan doughnuts made with coconut milk, cardamom and wheat flour.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-sausages.jpg" alt="Sausages"><span class="item-name">Farmers Choice Kenya Sausages<span class="item-desc">Thick raw sausages from seasoned minced pork or beef, mildly herbed with a savory traditional taste and natural casing that crisps when fried.</span></span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-kebabs.jpg" alt="Kebabs"><span class="item-name">Kebabs<span class="item-desc">Popular deep-fried snack made from spiced minced meat shaped into cylindrical forms, coated in egg and breadcrumbs, and fried golden brown.</span></span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-meatpies.jpg" alt="Meatpies"><span class="item-name">Meatpies<span class="item-desc">Savory pastries filled with seasoned minced meat and vegetables, enclosed in a golden, flaky pastry shell.</span></span><span class="item-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+
+    <!-- KIDS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">🧒</span><span class="category-title">Kids</span></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-nuggets.jpg" alt="Chicken Nuggets"><span class="item-name">Chicken Nuggets<span class="item-desc">Bite-sized pieces of chicken, breaded and deep-fried until golden and crispy.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-fries.jpg" alt="Fries"><span class="item-name">Fries<span class="item-desc">Golden brown and crispy on the outside, soft and fluffy on the inside.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-pasta-meatballs.jpg" alt="Pasta Meatballs"><span class="item-name">Pasta 'N' Meatballs<span class="item-desc">Cooked pasta and meatballs combined in a tomato sauce seasoned with herbs and spices.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-mac-cheese.jpg" alt="Mac N Cheese"><span class="item-name">Mac N Cheese<span class="item-desc">Classic comfort food — elbow macaroni pasta in a creamy, indulgent cheese sauce.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+
+    <!-- BEVERAGES -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">☕</span><span class="category-title">Beverages</span></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chai-masala.jpg" alt="Chai Masala"><span class="item-name">Chai Masala<span class="item-sub">50 cups</span><span class="item-desc">A spiced tea deeply rooted in Kenyan culture — strong Kenyan-grown black tea blended with cinnamon, cardamom, ginger, milk and sugar.</span></span><span class="item-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><img class="item-img" loading="lazy" onclick="expandImg(this)" src="img-chai.jpg" alt="Chai"><span class="item-name">Chai<span class="item-sub">50 cups</span><span class="item-desc">Black tea brewed with a blend of spices, cloves and sometimes pepper, then finished with milk and sugar.</span></span><span class="item-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+
+    <!-- CHAFERS -->
+    <div class="category">
+      <div class="category-header"><span class="category-icon">✨</span><span class="category-title">Chafers</span></div>
+      <div class="item"><span class="item-name">Chafing Dishes (Gold Luxury)</span><span class="item-price">$15 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+      <div class="item"><span class="item-name">Chafing Dishes (Silver)</span><span class="item-price">$10 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div>
+    </div>
+  </main>
+
+  <div class="cart-bar" id="cartBar" onclick="openModal()">
+    <span>🛒</span>
+    <span id="cartLabel">0 items</span>
+    <span class="cart-total" id="cartTotal">$0</span>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <span class="modal-title" id="modalTitle">Your Order</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="screenSummary">
+        <div class="modal-body" id="summaryBody"></div>
+        <div style="padding:0 22px 8px">
+          <button class="btn-primary" id="proceedBtn" onclick="showForm()">Confirm Order →</button>
+        </div>
+        <p class="modal-note">We'll contact you to confirm delivery &amp; payment.</p>
+      </div>
+      <div id="screenForm" style="display:none">
+        <div class="modal-body">
+          <div class="form-field"><label>Full Name *</label><input type="text" id="fName" placeholder="Your full name"></div>
+          <div class="form-field">
+            <label>Phone Number *</label>
+            <div class="phone-row"><span class="phone-flag">🇺🇸 +1</span><input type="tel" id="fPhone" placeholder="(555) 000-0000" maxlength="14" oninput="fmtPhone(this)"></div>
+          </div>
+          <div class="form-field"><label>Event Date *</label><input type="date" id="fDate"></div>
+          <div class="form-field"><label>Delivery / Pickup Location</label><textarea id="fAddress" rows="2" placeholder="Street address or pickup point"></textarea></div>
+          <div class="form-field"><label>Dietary Requirements / Notes</label><textarea id="fNotes" rows="2" placeholder="e.g. nut allergy, halal only, extra spicy…"></textarea></div>
+          <button class="btn-primary" id="submitBtn" onclick="submitOrder()">Submit Order ✓</button>
+          <button class="btn-ghost" onclick="showSummary()">← Back to Order</button>
+        </div>
+        <p class="modal-note">We'll reach out shortly to finalize everything.</p>
+      </div>
+      <div id="screenSuccess" style="display:none">
+        <div class="modal-body">
+          <div class="success-screen">
+            <div class="success-icon">👑</div>
+            <div class="success-title">Order Received!</div>
+            <p class="success-msg" id="successMsg"></p>
+          </div>
+          <button class="btn-primary" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /#customerPage -->
+
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="adminLoginPage">
+  <div class="admin-login">
+    <div style="font-size:2rem;margin-bottom:10px">🔒</div>
+    <h2>Admin Access</h2>
+    <p>Zilicious Catering — Orders Dashboard</p>
+    <div class="form-field"><label>Password</label><input type="password" id="adminPwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <button class="btn-primary" onclick="adminLogin()">Sign In</button>
+    <p style="margin-top:14px;font-size:.8rem;color:var(--muted)"><a href="/" style="color:var(--rose)">← Back to menu</a></p>
+  </div>
+</div>
+
+<!-- ═══ ADMIN PANEL ═══ -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <div><h2>📋 Orders Dashboard</h2><p>Zilicious Catering · All submitted orders</p></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+      <button class="admin-logout" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="adminStats">
+    <div class="stat-box"><div class="stat-label">Total Orders</div><div class="stat-val" id="statOrders">—</div></div>
+    <div class="stat-box"><div class="stat-label">Total Revenue</div><div class="stat-val" id="statRevenue">—</div></div>
+    <div class="stat-box"><div class="stat-label">This Month</div><div class="stat-val" id="statMonth">—</div></div>
+    <div class="stat-box"><div class="stat-label">Next Event</div><div class="stat-val" id="statNext" style="font-size:1.1rem;padding-top:8px">—</div></div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('orders',this)">📦 Orders</button>
+    <button class="tab-btn" onclick="switchTab('report',this)">📊 Sales Report</button>
+    <button class="tab-btn" onclick="switchTab('blocked',this)">🚫 Blocked Dates</button>
+    <button class="tab-btn" onclick="switchTab('voided',this)">🗑 Voided Orders</button>
+    <button class="tab-btn" onclick="switchTab('contacts',this)">📇 Contacts</button>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div class="tab-pane active" id="tab-orders">
+    <div id="ordersContainer"></div>
+  </div>
+
+  <!-- SALES REPORT TAB -->
+  <div class="tab-pane" id="tab-report">
+    <div class="report-filter">
+      <label style="font-size:.85rem;font-weight:500;color:var(--mid)">Period:</label>
+      <select id="reportPeriod" onchange="renderReport()">
+        <option value="day">Today</option>
+        <option value="week">This Week</option>
+        <option value="month" selected>This Month</option>
+        <option value="year">This Year</option>
+      </select>
+    </div>
+    <div class="report-summary" id="reportSummary"></div>
+    <div class="report-table" id="reportTable" style="margin-top:16px"></div>
+  </div>
+
+  <!-- BLOCKED DATES TAB -->
+  <div class="tab-pane" id="tab-blocked">
+    <div class="blocked-section">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--rose)">Blocked / Booked Dates</h3>
+      <p style="font-size:.84rem;color:var(--muted);margin-top:4px">Customers won't be able to select these dates when placing an order.</p>
+      <div class="add-blocked-row">
+        <input type="date" id="blockDateInput">
+        <input type="text" id="blockNoteInput" placeholder="Reason (optional)" style="flex:2">
+        <button class="btn-add-block" onclick="addBlockedDate()">+ Block Date</button>
+      </div>
+      <div class="blocked-list" id="blockedList"></div>
+    </div>
+  </div>
+
+  <!-- VOIDED ORDERS TAB -->
+  <div class="tab-pane" id="tab-voided">
+    <div id="voidedContainer"></div>
+  </div>
+
+  <!-- CONTACTS TAB -->
+  <div class="tab-pane" id="tab-contacts">
+    <div class="contacts-section">
+      <h3>All Customer Contacts</h3>
+      <p>Every customer who has placed an order — including voided orders. Use for appreciation messages, follow-ups, and promotions.</p>
+      <div class="export-btns" style="margin-bottom:16px">
+        <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="export-btn" onclick="copyAllPhones()">📋 Copy All Phone Numbers</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="contacts-table" id="contactsTable">
+          <thead><tr><th>Name</th><th>Phone</th><th>Event Date</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="contactsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INVOICE MODAL ═══ -->
+<div id="invoiceOverlay">
+  <div class="invoice-modal">
+    <div class="invoice-actions">
+      <button class="inv-btn" onclick="closeInvoice()">✕ Close</button>
+      <button class="inv-btn" onclick="window.print()">🖨 Print</button>
+      <button class="inv-btn primary" onclick="shareInvoice()">📤 Share / Copy Link</button>
+    </div>
+    <div class="invoice-body" id="invoiceBody"></div>
+  </div>
+</div>
+
+<script>
+/* ═══ CONFIG ═══ */
+const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbzJgr-TKnm1gO-_XbOKtZ3Chgq8YO3Bp0eXeD28Kwc-LNhb4Onl9VbD_AWjiGgLJd3M/exec';
+const ADMIN_PASSWORD = 'Zilicious2027';
+const SITE_URL = 'https://zilicious-im2e.vercel.app/';
+
+/* ═══ DARK MODE ═══ */
+(function(){
+  const saved = localStorage.getItem('zil_theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+window.addEventListener('DOMContentLoaded', () => {
+  updateDMIcon();
+  const isAdmin = location.search.includes('admin');
+  if (isAdmin) {
+    document.getElementById('customerPage').style.display = 'none';
+    sessionStorage.getItem('zil_admin') === '1' ? showAdminPanel() : (document.getElementById('adminLoginPage').style.display = 'block');
+  } else {
+    generateQR();
+  }
+  document.getElementById('fDate').addEventListener('change', validateDate);
+  // Lazy-load images with IntersectionObserver for extra speed
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting){ const img=e.target; if(img.dataset.src){img.src=img.dataset.src;io.unobserve(img);} } });
+    }, {rootMargin:'200px'});
+    document.querySelectorAll('img.item-img[loading="lazy"]').forEach(img => io.observe(img));
+  }
+});
+
+function toggleDark() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('zil_theme', next);
+  updateDMIcon();
+}
+function updateDMIcon() {
+  const btn = document.getElementById('dmToggle');
+  if(!btn) return;
+  btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+}
+document.getElementById('dmToggle').addEventListener('click', toggleDark);
+
+/* ═══ IMAGE LIGHTBOX ═══ */
+function expandImg(img) {
+  const name = img.closest('.item').querySelector('.item-name').childNodes[0].textContent.trim();
+  document.getElementById('lightboxImg').src = img.src;
+  document.getElementById('lightboxName').textContent = name;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
+/* ═══ QR CODE ═══ */
+function generateQR() {
+  const canvas = document.getElementById('qrCanvas');
+  if (!canvas) return;
+  const size = 200;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  // Load QR library dynamically
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  s.onload = () => {
+    canvas.style.display = 'none';
+    const div = document.createElement('div');
+    div.id = 'qrDiv';
+    canvas.parentNode.insertBefore(div, canvas);
+    new QRCode(div, {
+      text: SITE_URL,
+      width: 180, height: 180,
+      colorDark: '#9f2a6f',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    // Overlay logo on QR after render
+    setTimeout(() => {
+      const qrImg = div.querySelector('img') || div.querySelector('canvas');
+      if (qrImg) {
+        qrImg.style.borderRadius = '12px';
+        qrImg.style.display = 'block';
+        qrImg.style.margin = '0 auto';
+      }
+    }, 200);
+  };
+  document.head.appendChild(s);
+}
+
+function downloadQR() {
+  const qrImg = document.querySelector('#qrDiv img') || document.querySelector('#qrDiv canvas');
+  if (!qrImg) return;
+  const a = document.createElement('a');
+  if (qrImg.tagName === 'IMG') {
+    a.href = qrImg.src;
+  } else {
+    a.href = qrImg.toDataURL('image/png');
+  }
+  a.download = 'zilicious-qr.png';
+  a.click();
+}
+
+/* ═══ CART ═══ */
+const cart = {};
+function parsePrice(t) { return parseFloat(t.replace(/[^0-9.]/g,'')) || 0; }
+
+function adj(btn, delta) {
+  const inp = btn.parentElement.querySelector('.qty-input');
+  inp.value = Math.max(0, parseInt(inp.value||0) + delta);
+  syncItem(inp);
+}
+function setQty(inp) {
+  inp.value = Math.max(0, parseInt(inp.value)||0);
+  syncItem(inp);
+}
+function syncItem(inp) {
+  const item  = inp.closest('.item');
+  const name  = item.querySelector('.item-name').childNodes[0].textContent.trim();
+  const price = parsePrice(item.querySelector('.item-price').textContent);
+  const qty   = parseInt(inp.value) || 0;
+  const ctrl  = item.querySelector('.qty-control');
+  if (qty > 0) cart[name] = { qty, price };
+  else delete cart[name];
+  ctrl.classList.toggle('active', qty > 0);
+  updateCartBar();
+}
+function updateCartBar() {
+  let count=0, total=0;
+  Object.values(cart).forEach(i=>{ count+=i.qty; total+=i.qty*i.price; });
+  document.getElementById('cartLabel').textContent = count===1?'1 item':`${count} items`;
+  document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('cartBar').classList.toggle('visible', count>0);
+}
+
+/* ═══ MODAL ═══ */
+function openModal(){ showSummary(); document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+function showSummary() {
+  document.getElementById('modalTitle').textContent = 'Your Order';
+  document.getElementById('screenSummary').style.display = 'block';
+  document.getElementById('screenForm').style.display = 'none';
+  document.getElementById('screenSuccess').style.display = 'none';
+  const keys = Object.keys(cart);
+  const body = document.getElementById('summaryBody');
+  if (!keys.length) {
+    body.innerHTML = `<div class="empty-cart"><div class="empty-icon">🛒</div><p>Your cart is empty.</p></div>`;
+    document.getElementById('proceedBtn').style.display='none'; return;
+  }
+  document.getElementById('proceedBtn').style.display='block';
+  let total=0, html='';
+  keys.forEach(n=>{ const {qty,price}=cart[n]; const sub=qty*price; total+=sub;
+    html+=`<div class="order-item"><span class="order-name">${n}</span><span class="order-qty">×${qty}</span><span class="order-price">$${sub.toLocaleString()}</span></div>`;
+  });
+  html+=`<div class="order-total-row"><span style="font-weight:600">Total</span><span class="order-total-value">$${total.toLocaleString()}</span></div>`;
+  body.innerHTML=html;
+}
+function showForm() {
+  if (!Object.keys(cart).length) return;
+  document.getElementById('modalTitle').textContent='Contact Details';
+  document.getElementById('screenSummary').style.display='none';
+  document.getElementById('screenForm').style.display='block';
+}
+function fmtPhone(i) {
+  let v=i.value.replace(/\D/g,'').slice(0,10);
+  if(v.length>=7) v=`(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+  else if(v.length>=4) v=`(${v.slice(0,3)}) ${v.slice(3)}`;
+  else if(v.length>0) v=`(${v}`;
+  i.value=v;
+}
+function validateDate() {
+  const val = document.getElementById('fDate').value;
+  const blocked = JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if (blocked.find(b=>b.date===val)) {
+    alert('Sorry, that date is already booked. Please choose a different date.');
+    document.getElementById('fDate').value='';
+  }
+}
+
+/* ═══ SUBMIT ORDER ═══ */
+async function submitOrder() {
+  const name  = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const date  = document.getElementById('fDate').value;
+  if (!name||!phone||!date){ alert('Please fill in Full Name, Phone Number, and Event Date.'); return; }
+  const address = document.getElementById('fAddress').value.trim();
+  const notes   = document.getElementById('fNotes').value.trim();
+  let total=0;
+  const items = Object.entries(cart).map(([n,{qty,price}])=>{ total+=qty*price; return {name:n,qty,price,subtotal:qty*price}; });
+  const order = { id:'ORD-'+Date.now(), timestamp:new Date().toISOString(), customerName:name,
+    phone:'+1 '+phone, eventDate:date, address, notes, items, total };
+  const stored = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  stored.unshift(order);
+  localStorage.setItem('zil_orders', JSON.stringify(stored));
+  if (SHEET_URL) {
+    const btn=document.getElementById('submitBtn');
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Submitting…';
+    try { await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)}); } catch(e){}
+    btn.disabled=false; btn.innerHTML='Submit Order ✓';
+  }
+  const fmtDate=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('successMsg').innerHTML=`Thank you, <strong>${name}</strong>! Your order totalling <strong>$${total.toLocaleString()}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you at <strong>+1 ${phone}</strong> shortly.`;
+  document.getElementById('modalTitle').textContent='All Done!';
+  document.getElementById('screenForm').style.display='none';
+  document.getElementById('screenSuccess').style.display='block';
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  document.querySelectorAll('.qty-input').forEach(el=>{ el.value=0; });
+  document.querySelectorAll('.qty-control').forEach(el=>el.classList.remove('active'));
+  updateCartBar();
+}
+document.getElementById('modalOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('modalOverlay'))closeModal(); });
+
+/* ═══ ADMIN AUTH ═══ */
+function adminLogin() {
+  const pw=document.getElementById('adminPwInput').value;
+  if(pw===ADMIN_PASSWORD){ sessionStorage.setItem('zil_admin','1'); document.getElementById('adminLoginPage').style.display='none'; showAdminPanel(); }
+  else { document.getElementById('adminPwInput').value=''; document.getElementById('adminPwInput').placeholder='Incorrect — try again'; document.getElementById('adminPwInput').style.borderColor='#e03'; }
+}
+function adminLogout(){ sessionStorage.removeItem('zil_admin'); location.href='/?admin'; }
+
+/* ═══ ADMIN PANEL ═══ */
+function showAdminPanel() {
+  document.getElementById('adminPanel').style.display='block';
+  loadOrders();
+  renderBlockedDates();
+}
+function loadOrders() {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const active=orders.filter(o=>!o.voided);
+  const now=new Date();
+  const thisMonth=active.filter(o=>{ const d=new Date(o.timestamp); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const monthTotal=thisMonth.reduce((s,o)=>s+o.total,0);
+  const allTotal=active.reduce((s,o)=>s+o.total,0);
+  document.getElementById('statOrders').textContent=active.length;
+  document.getElementById('statRevenue').textContent=`$${allTotal.toLocaleString()}`;
+  document.getElementById('statMonth').textContent=`$${monthTotal.toLocaleString()}`;
+  const next=active.filter(o=>new Date(o.eventDate+'T00:00:00')>=now).sort((a,b)=>new Date(a.eventDate)-new Date(b.eventDate))[0];
+  document.getElementById('statNext').textContent=next?new Date(next.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'None';
+  renderOrders(orders);
+  renderReport();
+}
+
+function renderOrders(orders) {
+  const active=orders.filter(o=>!o.voided);
+  const c=document.getElementById('ordersContainer');
+  if(!active.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">📭</div><p>No active orders yet.</p></div>`; return; }
+  c.innerHTML=active.map((o)=>{
+    const i=orders.indexOf(o);
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const subD=new Date(o.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card">
+      <div class="order-card-head" onclick="toggleCard('a${i}')">
+        <div><strong>${o.customerName}</strong><div class="order-meta">📅 Event: ${evtD} · Submitted: ${subD}</div></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="inv-btn" style="padding:6px 14px;font-size:.78rem" onclick="event.stopPropagation();openInvoice(${i})">🧾 Invoice</button>
+          <button class="btn-void" onclick="event.stopPropagation();voidOrder(${i})">🗑 Void</button>
+          <span class="order-badge">$${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-a${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Dietary / Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderVoided() {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const voided=orders.filter(o=>o.voided);
+  const c=document.getElementById('voidedContainer');
+  if(!voided.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">✅</div><p>No voided orders.</p></div>`; return; }
+  c.innerHTML=`<p style="font-size:.84rem;color:var(--muted);margin-bottom:14px">Excluded from all revenue stats.</p>`+
+  voided.map((o)=>{
+    const i=orders.indexOf(o);
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const voidD=new Date(o.voidedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card voided">
+      <div class="order-card-head" onclick="toggleCard('v${i}')">
+        <div><strong style="text-decoration:line-through;color:var(--muted)">${o.customerName}</strong>
+          <div class="order-meta">📅 Event: ${evtD} · Voided: ${voidD}</div>
+          ${o.voidReason?`<div class="void-reason">Reason: ${o.voidReason}</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn-restore" onclick="event.stopPropagation();restoreOrder(${i})">↩ Restore</button>
+          <span class="badge-voided">VOIDED · $${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-v${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Dietary / Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function voidOrder(idx) {
+  const reason = prompt('Reason for voiding this order (optional):');
+  if (reason === null) return;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  orders[idx].voided=true; orders[idx].voidedAt=new Date().toISOString(); orders[idx].voidReason=reason.trim();
+  localStorage.setItem('zil_orders',JSON.stringify(orders)); loadOrders();
+}
+function restoreOrder(idx) {
+  if(!confirm('Restore this order?')) return;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  delete orders[idx].voided; delete orders[idx].voidedAt; delete orders[idx].voidReason;
+  localStorage.setItem('zil_orders',JSON.stringify(orders)); loadOrders(); renderVoided();
+}
+function toggleCard(id){ document.getElementById(`card-${id}`).classList.toggle('open'); }
+
+/* ═══ CONTACTS ═══ */
+function renderContacts() {
+  const orders = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  // Deduplicate by phone, keeping all orders per person
+  const seen = {}; const unique = [];
+  orders.forEach(o => {
+    const key = o.phone;
+    if (!seen[key]) { seen[key] = true; unique.push(o); }
+  });
+  unique.sort((a,b) => a.customerName.localeCompare(b.customerName));
+  const tbody = document.getElementById('contactsBody');
+  if (!unique.length) { tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">No contacts yet.</td></tr>`; return; }
+  tbody.innerHTML = unique.map(o => {
+    const evtD = new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const status = o.voided ? `<span class="voided-tag">Voided</span>` : `<span style="color:var(--rose);font-weight:600">Active</span>`;
+    return `<tr>
+      <td>${o.customerName}</td>
+      <td>${o.phone}</td>
+      <td>${evtD}</td>
+      <td>$${o.total.toLocaleString()}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV() {
+  const orders = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const seen = {}; const rows = [['Name','Phone','Event Date','Order Total','Status','Notes']];
+  orders.forEach(o => {
+    if (seen[o.phone]) return; seen[o.phone] = true;
+    const evtD = new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US');
+    rows.push([o.customerName, o.phone, evtD, `$${o.total}`, o.voided?'Voided':'Active', o.notes||'']);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'zilicious-contacts.csv'; a.click();
+}
+
+function copyAllPhones() {
+  const orders = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const seen = {}; const phones = [];
+  orders.forEach(o => { if(!seen[o.phone]){ seen[o.phone]=true; phones.push(`${o.customerName}: ${o.phone}`); } });
+  if (!phones.length) { alert('No contacts yet.'); return; }
+  navigator.clipboard.writeText(phones.join('\n')).then(() => alert(`✓ Copied ${phones.length} contacts to clipboard!`));
+}
+
+/* ═══ SALES REPORT ═══ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='report') renderReport();
+  if(name==='blocked') renderBlockedDates();
+  if(name==='voided') renderVoided();
+  if(name==='contacts') renderContacts();
+}
+
+function renderReport() {
+  const period=document.getElementById('reportPeriod').value;
+  const allOrders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const orders=allOrders.filter(o=>!o.voided);
+  const now=new Date();
+  const filtered=orders.filter(o=>{
+    const d=new Date(o.timestamp);
+    if(period==='day') return d.toDateString()===now.toDateString();
+    if(period==='week'){ const wStart=new Date(now); wStart.setDate(now.getDate()-now.getDay()); return d>=wStart; }
+    if(period==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(period==='year') return d.getFullYear()===now.getFullYear();
+    return true;
+  });
+  const totalRev=filtered.reduce((s,o)=>s+o.total,0);
+  const avgOrder=filtered.length?Math.round(totalRev/filtered.length):0;
+  const itemMap={};
+  filtered.forEach(o=>o.items.forEach(it=>{
+    if(!itemMap[it.name]) itemMap[it.name]={qty:0,rev:0};
+    itemMap[it.name].qty+=it.qty; itemMap[it.name].rev+=it.subtotal;
+  }));
+  const topItems=Object.entries(itemMap).sort((a,b)=>b[1].rev-a[1].rev);
+  document.getElementById('reportSummary').innerHTML=`
+    <div class="rs-item"><div class="rs-label">Orders</div><div class="rs-val">${filtered.length}</div></div>
+    <div class="rs-item"><div class="rs-label">Revenue</div><div class="rs-val">$${totalRev.toLocaleString()}</div></div>
+    <div class="rs-item"><div class="rs-label">Avg Order</div><div class="rs-val">$${avgOrder.toLocaleString()}</div></div>`;
+  if(!topItems.length){ document.getElementById('reportTable').innerHTML=`<div class="no-orders" style="padding:40px"><p>No orders in this period.</p></div>`; return; }
+  document.getElementById('reportTable').innerHTML=`<table>
+    <thead><tr><th>Item</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+    <tbody>${topItems.map(([name,{qty,rev}])=>`<tr><td>${name}</td><td>${qty}</td><td>$${rev.toLocaleString()}</td></tr>`).join('')}</tbody>
+  </table>`;
+}
+
+/* ═══ BLOCKED DATES ═══ */
+function addBlockedDate() {
+  const date=document.getElementById('blockDateInput').value;
+  const note=document.getElementById('blockNoteInput').value.trim();
+  if(!date){ alert('Please select a date.'); return; }
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if(blocked.find(b=>b.date===date)){ alert('That date is already blocked.'); return; }
+  blocked.push({date,note}); blocked.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked));
+  document.getElementById('blockDateInput').value=''; document.getElementById('blockNoteInput').value='';
+  renderBlockedDates();
+}
+function removeBlockedDate(date) {
+  let blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  blocked=blocked.filter(b=>b.date!==date);
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked)); renderBlockedDates();
+}
+function renderBlockedDates() {
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  const list=document.getElementById('blockedList');
+  if(!blocked.length){ list.innerHTML=`<p style="color:var(--muted);font-size:.85rem;margin-top:10px">No dates blocked yet.</p>`; return; }
+  list.innerHTML=blocked.map(b=>{
+    const fmt=new Date(b.date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="blocked-row"><div><div class="bd-date">${fmt}</div>${b.note?`<div class="bd-note">${b.note}</div>`:''}</div>
+      <button class="btn-del" onclick="removeBlockedDate('${b.date}')">✕</button></div>`;
+  }).join('');
+}
+
+/* ═══ INVOICE ═══ */
+function openInvoice(idx) {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const o=orders[idx]; if(!o) return;
+  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const itemRows=o.items.map((it,i)=>`
+    <tr><td>${it.name}</td>
+    <td class="qty-cell"><input type="number" value="${it.qty}" min="1" data-price="${it.price}" oninput="recalcInvoice()" id="invQty${i}"></td>
+    <td>$${it.price.toLocaleString()}</td><td id="invSub${i}">$${it.subtotal.toLocaleString()}</td></tr>`).join('');
+  document.getElementById('invoiceBody').innerHTML=`
+    <div class="inv-header">
+      <div><div class="inv-title">Invoice</div><div class="inv-id">${o.id}</div><div style="font-size:.8rem;color:#9e8090;margin-top:4px">Issued: ${subDate}</div></div>
+      <div class="inv-brand"><img src="232784.png" class="inv-logo" onerror="this.style.display='none'"><h2>Zilicious Catering</h2><p>Luxury Catering · Premium Events</p></div>
+    </div>
+    <div class="inv-meta-grid">
+      <div><div class="im-label">Billed To</div><input class="inv-edit" value="${o.customerName}" placeholder="Customer name"></div>
+      <div><div class="im-label">Phone</div><input class="inv-edit" value="${o.phone}" placeholder="Phone"></div>
+      <div><div class="im-label">Event Date</div><input class="inv-edit" value="${evtDate}" placeholder="Event date"></div>
+      <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" value="${o.address||''}" placeholder="Location"></div>
+    </div>
+    <table class="inv-items-table" id="invTable">
+      <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end">
+      <div class="inv-totals" id="invTotals">
+        <div class="it-row"><span>Subtotal</span><span id="invSubtotal">$${o.total.toLocaleString()}</span></div>
+        <div class="it-row"><span>Transport / Extra</span><input type="number" id="invTransport" value="0" min="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>Discount</span><input type="number" id="invDiscount" value="0" min="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>TOTAL DUE</span><span id="invGrandTotal">$${o.total.toLocaleString()}</span></div>
+      </div>
+    </div>
+    <div class="inv-notes-section"><label>Dietary Concerns / Notes</label><textarea placeholder="Any dietary requirements or special instructions…">${o.notes||''}</textarea></div>
+    <div class="inv-notes-section" style="margin-top:12px"><label>Terms / Message</label><textarea>50% deposit required to confirm booking. Balance due on event day. Thank you for choosing Zilicious Catering!</textarea></div>
+    <div class="inv-footer">Zilicious Catering · Luxury Catering &amp; Premium Events<br>Thank you for your business!</div>`;
+  document.getElementById('invoiceOverlay').classList.add('open');
+}
+
+function recalcInvoice() {
+  let subtotal=0;
+  document.querySelectorAll('#invTable tbody tr').forEach((row,i)=>{
+    const qtyInp=row.querySelector('input[type=number]');
+    const price=parseFloat(qtyInp.dataset.price)||0;
+    const qty=parseInt(qtyInp.value)||0;
+    const sub=qty*price; subtotal+=sub;
+    row.querySelector(`#invSub${i}`).textContent='$'+sub.toLocaleString();
+  });
+  const transport=parseFloat(document.getElementById('invTransport').value)||0;
+  const discount=parseFloat(document.getElementById('invDiscount').value)||0;
+  document.getElementById('invSubtotal').textContent='$'+subtotal.toLocaleString();
+  document.getElementById('invGrandTotal').textContent='$'+Math.max(0,subtotal+transport-discount).toLocaleString();
+}
+function closeInvoice(){ document.getElementById('invoiceOverlay').classList.remove('open'); }
+function shareInvoice() {
+  if(navigator.clipboard){ navigator.clipboard.writeText(location.href).then(()=>alert('Page URL copied! Use Print to save as PDF.')); }
+  else { alert('Use the Print button to save as PDF.'); }
+}
+</script>
+
+/* ═══ ROUTING ═══ */
+window.addEventListener('DOMContentLoaded', () => {
+  const isAdmin = location.search.includes('admin');
+  if (isAdmin) {
+    document.getElementById('customerPage').style.display = 'none';
+    sessionStorage.getItem('zil_admin') === '1' ? showAdminPanel() : (document.getElementById('adminLoginPage').style.display = 'block');
+  }
+  document.getElementById('fDate').addEventListener('change', validateDate);
+});
+
+/* ═══ CART ═══ */
+const cart = {};
+
+function parsePrice(t) { return parseFloat(t.replace(/[^0-9.]/g,'')) || 0; }
+
+function adj(btn, delta) {
+  const inp = btn.parentElement.querySelector('.qty-input');
+  inp.value = Math.max(0, parseInt(inp.value||0) + delta);
+  syncItem(inp);
+}
+
+function setQty(inp) {
+  inp.value = Math.max(0, parseInt(inp.value)||0);
+  syncItem(inp);
+}
+
+function syncItem(inp) {
+  const item  = inp.closest('.item');
+  const name  = item.querySelector('.item-name').childNodes[0].textContent.trim();
+  const price = parsePrice(item.querySelector('.item-price').textContent);
+  const qty   = parseInt(inp.value) || 0;
+  const ctrl  = item.querySelector('.qty-control');
+
+  if (qty > 0) cart[name] = { qty, price };
+  else delete cart[name];
+
+  ctrl.classList.toggle('active', qty > 0);
+  updateCartBar();
+}
+
+function updateCartBar() {
+  let count=0, total=0;
+  Object.values(cart).forEach(i=>{ count+=i.qty; total+=i.qty*i.price; });
+  document.getElementById('cartLabel').textContent = count===1?'1 item':`${count} items`;
+  document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('cartBar').classList.toggle('visible', count>0);
+}
+
+/* ═══ MODAL ═══ */
+function openModal(){ showSummary(); document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+function showSummary() {
+  document.getElementById('modalTitle').textContent = 'Your Order';
+  document.getElementById('screenSummary').style.display = 'block';
+  document.getElementById('screenForm').style.display = 'none';
+  document.getElementById('screenSuccess').style.display = 'none';
+  const keys = Object.keys(cart);
+  const body = document.getElementById('summaryBody');
+  if (!keys.length) {
+    body.innerHTML = `<div class="empty-cart"><div class="empty-icon">🛒</div><p>Your cart is empty.</p></div>`;
+    document.getElementById('proceedBtn').style.display='none'; return;
+  }
+  document.getElementById('proceedBtn').style.display='block';
+  let total=0, html='';
+  keys.forEach(n=>{ const {qty,price}=cart[n]; const sub=qty*price; total+=sub;
+    html+=`<div class="order-item"><span class="order-name">${n}</span><span class="order-qty">×${qty}</span><span class="order-price">$${sub.toLocaleString()}</span></div>`;
+  });
+  html+=`<div class="order-total-row"><span style="font-weight:600">Total</span><span class="order-total-value">$${total.toLocaleString()}</span></div>`;
+  body.innerHTML=html;
+}
+
+function showForm() {
+  if (!Object.keys(cart).length) return;
+  document.getElementById('modalTitle').textContent='Contact Details';
+  document.getElementById('screenSummary').style.display='none';
+  document.getElementById('screenForm').style.display='block';
+}
+
+/* ═══ PHONE FORMAT ═══ */
+function fmtPhone(i) {
+  let v=i.value.replace(/\D/g,'').slice(0,10);
+  if(v.length>=7) v=`(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+  else if(v.length>=4) v=`(${v.slice(0,3)}) ${v.slice(3)}`;
+  else if(v.length>0) v=`(${v}`;
+  i.value=v;
+}
+
+/* ═══ DATE VALIDATION (blocked dates) ═══ */
+function validateDate() {
+  const val = document.getElementById('fDate').value;
+  const blocked = JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if (blocked.find(b=>b.date===val)) {
+    alert('Sorry, that date is already booked. Please choose a different date.');
+    document.getElementById('fDate').value='';
+  }
+}
+
+/* ═══ SUBMIT ORDER ═══ */
+async function submitOrder() {
+  const name  = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const date  = document.getElementById('fDate').value;
+  if (!name||!phone||!date){ alert('Please fill in Full Name, Phone Number, and Event Date.'); return; }
+
+  const address = document.getElementById('fAddress').value.trim();
+  const notes   = document.getElementById('fNotes').value.trim();
+  let total=0;
+  const items = Object.entries(cart).map(([n,{qty,price}])=>{ total+=qty*price; return {name:n,qty,price,subtotal:qty*price}; });
+
+  const order = { id:'ORD-'+Date.now(), timestamp:new Date().toISOString(), customerName:name,
+    phone:'+1 '+phone, eventDate:date, address, notes, items, total };
+
+  const stored = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  stored.unshift(order);
+  localStorage.setItem('zil_orders', JSON.stringify(stored));
+
+  if (SHEET_URL) {
+    const btn=document.getElementById('submitBtn');
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Submitting…';
+    try { await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)}); } catch(e){}
+    btn.disabled=false; btn.innerHTML='Submit Order ✓';
+  }
+
+  const fmtDate=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('successMsg').innerHTML=`Thank you, <strong>${name}</strong>! Your order totalling <strong>$${total.toLocaleString()}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you at <strong>+1 ${phone}</strong> shortly.`;
+  document.getElementById('modalTitle').textContent='All Done!';
+  document.getElementById('screenForm').style.display='none';
+  document.getElementById('screenSuccess').style.display='block';
+
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  document.querySelectorAll('.qty-input').forEach(el=>{ el.value=0; });
+  document.querySelectorAll('.qty-control').forEach(el=>el.classList.remove('active'));
+  updateCartBar();
+}
+
+document.getElementById('modalOverlay').addEventListener('click',e=>{ if(e.target===document.getElementById('modalOverlay'))closeModal(); });
+
+/* ═══ ADMIN AUTH ═══ */
+function adminLogin() {
+  const pw=document.getElementById('adminPwInput').value;
+  if(pw===ADMIN_PASSWORD){ sessionStorage.setItem('zil_admin','1'); document.getElementById('adminLoginPage').style.display='none'; showAdminPanel(); }
+  else { document.getElementById('adminPwInput').value=''; document.getElementById('adminPwInput').placeholder='Incorrect — try again'; document.getElementById('adminPwInput').style.borderColor='#e03'; }
+}
+function adminLogout(){ sessionStorage.removeItem('zil_admin'); location.href='/?admin'; }
+
+/* ═══ ADMIN PANEL ═══ */
+function showAdminPanel() {
+  document.getElementById('adminPanel').style.display='block';
+  loadOrders();
+  renderBlockedDates();
+}
+
+function loadOrders() {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const active=orders.filter(o=>!o.voided);
+  const now=new Date();
+  const thisMonth=active.filter(o=>{ const d=new Date(o.timestamp); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const monthTotal=thisMonth.reduce((s,o)=>s+o.total,0);
+  const allTotal=active.reduce((s,o)=>s+o.total,0);
+  document.getElementById('statOrders').textContent=active.length;
+  document.getElementById('statRevenue').textContent=`$${allTotal.toLocaleString()}`;
+  document.getElementById('statMonth').textContent=`$${monthTotal.toLocaleString()}`;
+  const next=active.filter(o=>new Date(o.eventDate+'T00:00:00')>=now).sort((a,b)=>new Date(a.eventDate)-new Date(b.eventDate))[0];
+  document.getElementById('statNext').textContent=next?new Date(next.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'None';
+  renderOrders(orders);
+  renderReport();
+}
+
+function renderOrders(orders) {
+  const active=orders.filter(o=>!o.voided);
+  const c=document.getElementById('ordersContainer');
+  if(!active.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">📭</div><p>No active orders yet.</p></div>`; return; }
+  c.innerHTML=active.map((o)=>{
+    const i=orders.indexOf(o);
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const subD=new Date(o.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card">
+      <div class="order-card-head" onclick="toggleCard('a${i}')">
+        <div><strong>${o.customerName}</strong><div class="order-meta">📅 Event: ${evtD} · Submitted: ${subD}</div></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="inv-btn" style="padding:6px 14px;font-size:.78rem" onclick="event.stopPropagation();openInvoice(${i})">🧾 Invoice</button>
+          <button class="btn-void" onclick="event.stopPropagation();voidOrder(${i})">🗑 Void</button>
+          <span class="order-badge">$${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-a${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Dietary / Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderVoided() {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const voided=orders.filter(o=>o.voided);
+  const c=document.getElementById('voidedContainer');
+  if(!voided.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">✅</div><p>No voided orders.</p></div>`; return; }
+  c.innerHTML=`<p style="font-size:.84rem;color:var(--muted);margin-bottom:14px">These orders are kept for reference but excluded from all revenue stats.</p>`+
+  voided.map((o)=>{
+    const i=orders.indexOf(o);
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const voidD=new Date(o.voidedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card voided">
+      <div class="order-card-head" onclick="toggleCard('v${i}')">
+        <div>
+          <strong style="text-decoration:line-through;color:var(--muted)">${o.customerName}</strong>
+          <div class="order-meta">📅 Event: ${evtD} · Voided: ${voidD}</div>
+          ${o.voidReason?`<div class="void-reason">Reason: ${o.voidReason}</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn-restore" onclick="event.stopPropagation();restoreOrder(${i})">↩ Restore</button>
+          <span class="badge-voided">VOIDED · $${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-v${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Dietary / Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function voidOrder(idx) {
+  const reason = prompt('Reason for voiding this order (optional):');
+  if (reason === null) return; // cancelled
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  orders[idx].voided=true;
+  orders[idx].voidedAt=new Date().toISOString();
+  orders[idx].voidReason=reason.trim();
+  localStorage.setItem('zil_orders',JSON.stringify(orders));
+  loadOrders();
+}
+
+function restoreOrder(idx) {
+  if(!confirm('Restore this order? It will be moved back to active orders.')) return;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  delete orders[idx].voided;
+  delete orders[idx].voidedAt;
+  delete orders[idx].voidReason;
+  localStorage.setItem('zil_orders',JSON.stringify(orders));
+  loadOrders();
+  renderVoided();
+}
+
+function toggleCard(id){ document.getElementById(`card-${id}`).classList.toggle('open'); }
+
+/* ═══ SALES REPORT ═══ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='report') renderReport();
+  if(name==='blocked') renderBlockedDates();
+  if(name==='voided') renderVoided();
+}
+
+function renderReport() {
+  const period=document.getElementById('reportPeriod').value;
+  const allOrders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  // Exclude voided orders from all report figures
+  const orders=allOrders.filter(o=>!o.voided);
+  const now=new Date();
+
+  const filtered=orders.filter(o=>{
+    const d=new Date(o.timestamp);
+    if(period==='day') return d.toDateString()===now.toDateString();
+    if(period==='week'){
+      const wStart=new Date(now); wStart.setDate(now.getDate()-now.getDay());
+      return d>=wStart;
+    }
+    if(period==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(period==='year') return d.getFullYear()===now.getFullYear();
+    return true;
+  });
+
+  const totalRev=filtered.reduce((s,o)=>s+o.total,0);
+  const avgOrder=filtered.length?Math.round(totalRev/filtered.length):0;
+
+  // Item breakdown
+  const itemMap={};
+  filtered.forEach(o=>o.items.forEach(it=>{
+    if(!itemMap[it.name]) itemMap[it.name]={qty:0,rev:0};
+    itemMap[it.name].qty+=it.qty; itemMap[it.name].rev+=it.subtotal;
+  }));
+  const topItems=Object.entries(itemMap).sort((a,b)=>b[1].rev-a[1].rev);
+
+  document.getElementById('reportSummary').innerHTML=`
+    <div class="rs-item"><div class="rs-label">Orders</div><div class="rs-val">${filtered.length}</div></div>
+    <div class="rs-item"><div class="rs-label">Revenue</div><div class="rs-val">$${totalRev.toLocaleString()}</div></div>
+    <div class="rs-item"><div class="rs-label">Avg Order</div><div class="rs-val">$${avgOrder.toLocaleString()}</div></div>`;
+
+  if(!topItems.length){ document.getElementById('reportTable').innerHTML=`<div class="no-orders" style="padding:40px"><p>No orders in this period.</p></div>`; return; }
+
+  document.getElementById('reportTable').innerHTML=`<table>
+    <thead><tr><th>Item</th><th>Qty Sold</th><th>Revenue</th></tr></thead>
+    <tbody>${topItems.map(([name,{qty,rev}])=>`<tr><td>${name}</td><td>${qty}</td><td>$${rev.toLocaleString()}</td></tr>`).join('')}</tbody>
+  </table>`;
+}
+
+/* ═══ BLOCKED DATES ═══ */
+function addBlockedDate() {
+  const date=document.getElementById('blockDateInput').value;
+  const note=document.getElementById('blockNoteInput').value.trim();
+  if(!date){ alert('Please select a date.'); return; }
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if(blocked.find(b=>b.date===date)){ alert('That date is already blocked.'); return; }
+  blocked.push({date,note});
+  blocked.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked));
+  document.getElementById('blockDateInput').value='';
+  document.getElementById('blockNoteInput').value='';
+  renderBlockedDates();
+}
+
+function removeBlockedDate(date) {
+  let blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  blocked=blocked.filter(b=>b.date!==date);
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked));
+  renderBlockedDates();
+}
+
+function renderBlockedDates() {
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  const list=document.getElementById('blockedList');
+  if(!blocked.length){ list.innerHTML=`<p style="color:var(--muted);font-size:.85rem;margin-top:10px">No dates blocked yet.</p>`; return; }
+  list.innerHTML=blocked.map(b=>{
+    const fmt=new Date(b.date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="blocked-row">
+      <div><div class="bd-date">${fmt}</div>${b.note?`<div class="bd-note">${b.note}</div>`:''}</div>
+      <button class="btn-del" onclick="removeBlockedDate('${b.date}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ INVOICE ═══ */
+function openInvoice(idx) {
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const o=orders[idx];
+  if(!o) return;
+  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  let subtotal=o.total;
+  const itemRows=o.items.map((it,i)=>`
+    <tr>
+      <td>${it.name}</td>
+      <td class="qty-cell"><input type="number" value="${it.qty}" min="1" data-price="${it.price}" oninput="recalcInvoice()" id="invQty${i}"></td>
+      <td>$${it.price.toLocaleString()}</td>
+      <td id="invSub${i}">$${it.subtotal.toLocaleString()}</td>
+    </tr>`).join('');
+
+  document.getElementById('invoiceBody').innerHTML=`
+    <div class="inv-header">
+      <div>
+        <div class="inv-title">Invoice</div>
+        <div class="inv-id">${o.id}</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:4px">Issued: ${subDate}</div>
+      </div>
+      <div class="inv-brand">
+        <img src="232784.png" class="inv-logo" onerror="this.style.display='none'">
+        <h2>Zilicious Catering</h2>
+        <p>Luxury Catering · Premium Events</p>
+      </div>
+    </div>
+
+    <div class="inv-meta-grid">
+      <div><div class="im-label">Billed To</div><input class="inv-edit" value="${o.customerName}" placeholder="Customer name"></div>
+      <div><div class="im-label">Phone</div><input class="inv-edit" value="${o.phone}" placeholder="Phone"></div>
+      <div><div class="im-label">Event Date</div><input class="inv-edit" value="${evtDate}" placeholder="Event date"></div>
+      <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" value="${o.address||''}" placeholder="Location"></div>
+    </div>
+
+    <table class="inv-items-table" id="invTable">
+      <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+
+    <div style="display:flex;justify-content:flex-end">
+      <div class="inv-totals" id="invTotals">
+        <div class="it-row"><span>Subtotal</span><span id="invSubtotal">$${subtotal.toLocaleString()}</span></div>
+        <div class="it-row"><span>Transport / Extra Fees</span><input type="number" id="invTransport" value="0" min="0" placeholder="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>Discount</span><input type="number" id="invDiscount" value="0" min="0" placeholder="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>TOTAL DUE</span><span id="invGrandTotal">$${subtotal.toLocaleString()}</span></div>
+      </div>
+    </div>
+
+    <div class="inv-notes-section">
+      <label>Special Dietary Concerns / Notes</label>
+      <textarea placeholder="Any dietary requirements, allergies, or special instructions for this event…">${o.notes||''}</textarea>
+    </div>
+    <div class="inv-notes-section" style="margin-top:12px">
+      <label>Additional Terms / Message to Client</label>
+      <textarea placeholder="e.g. 50% deposit required to confirm booking. Balance due on event day.">50% deposit required to confirm booking. Balance due on event day. Thank you for choosing Zilicious Catering!</textarea>
+    </div>
+
+    <div class="inv-footer">
+      Zilicious Catering · Luxury Catering &amp; Premium Events<br>
+      Thank you for your business!
+    </div>`;
+
+  document.getElementById('invoiceOverlay').classList.add('open');
+}
+
+function recalcInvoice() {
+  // Recalc row subtotals
+  document.querySelectorAll('#invTable tbody tr').forEach((row,i)=>{
+    const qtyInp=row.querySelector('input[type=number]');
+    const price=parseFloat(qtyInp.dataset.price)||0;
+    const qty=parseInt(qtyInp.value)||0;
+    const sub=qty*price;
+    row.querySelector(`#invSub${i}`).textContent='$'+sub.toLocaleString();
+  });
+  // Sum subtotals
+  let subtotal=0;
+  document.querySelectorAll('#invTable tbody tr').forEach((row,i)=>{
+    const qtyInp=row.querySelector('input[type=number]');
+    subtotal+=(parseInt(qtyInp.value)||0)*(parseFloat(qtyInp.dataset.price)||0);
+  });
+  const transport=parseFloat(document.getElementById('invTransport').value)||0;
+  const discount=parseFloat(document.getElementById('invDiscount').value)||0;
+  const grand=subtotal+transport-discount;
+  document.getElementById('invSubtotal').textContent='$'+subtotal.toLocaleString();
+  document.getElementById('invGrandTotal').textContent='$'+Math.max(0,grand).toLocaleString();
+}
+
+function closeInvoice(){ document.getElementById('invoiceOverlay').classList.remove('open'); }
+
+function shareInvoice() {
+  const url=location.href;
+  if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>alert('Page URL copied! Share this link with your client, or use the Print button to save as PDF.')); }
+  else { alert('Use the Print button (🖨) to save the invoice as a PDF, then share that file.'); }
+}
+</script>
+</body>
+</html>
