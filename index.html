@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zilicious Catering</title>
+<meta name="description" content="Zilicious Catering — Luxury Catering & Premium Events. Order online.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<style>
+/* ── THEME TOKENS ── */
+:root{
+  --pk:#e8006f; --pk2:#ff3399; --pk3:#ff80c0;
+  --blk:#0a0a0a; --blk2:#111; --blk3:#1a1a1a;
+  --card:#161616; --line:rgba(232,0,111,.22);
+  --text:#fff; --muted:#aaa; --mid:#ccc;
+  --shadow:rgba(232,0,111,.18); --bg:#0a0a0a;
+  --input-bg:#1e1e1e;
+}
+[data-theme="light"]{
+  --pk:#c8005f; --pk2:#e8006f; --pk3:#ff3399;
+  --blk:#fff; --blk2:#f5f5f5; --blk3:#ececec;
+  --card:#fff; --line:rgba(200,0,95,.15);
+  --text:#0a0a0a; --muted:#666; --mid:#333;
+  --shadow:rgba(200,0,95,.1); --bg:#f9f0f5;
+  --input-bg:#fff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s}
+
+/* ── DARK MODE TOGGLE ── */
+.dm-toggle{position:fixed;top:14px;right:14px;z-index:1500;width:40px;height:40px;border-radius:50%;background:rgba(10,10,10,.85);backdrop-filter:blur(8px);border:1.5px solid var(--pk);color:white;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .2s;box-shadow:0 0 12px rgba(232,0,111,.3)}
+.dm-toggle:hover{background:var(--pk);transform:scale(1.1)}
+
+/* ── HEADER ── */
+.header{background:var(--blk2);text-align:center;padding:32px 20px 28px;position:relative;overflow:hidden;border-bottom:2px solid var(--pk)}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 80% at 50% 0%,rgba(232,0,111,.25) 0%,transparent 70%);pointer-events:none}
+.logo-img{width:200px;height:200px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 14px;position:relative;z-index:1;border:3px solid var(--pk);box-shadow:0 0 40px rgba(232,0,111,.5)}
+.brand-name{font-family:'Playfair Display',serif;font-size:2.6rem;font-style:italic;font-weight:700;letter-spacing:.02em;color:var(--pk);position:relative;z-index:1;line-height:1.1;text-shadow:0 0 24px rgba(232,0,111,.45)}
+.tagline{color:var(--muted);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin-top:4px;position:relative;z-index:1}
+.price-note{display:inline-block;margin-top:12px;padding:5px 16px;border:1px solid rgba(232,0,111,.5);border-radius:100px;color:var(--pk3);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;position:relative;z-index:1}
+.qr-in-header{margin-top:18px;position:relative;z-index:1}
+.qr-in-header img{width:120px;height:120px;border-radius:10px;display:block;margin:0 auto;border:2px solid var(--pk)}
+.qr-in-header p{color:var(--muted);font-size:.72rem;margin-top:5px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ── LAYOUT ── */
+.page-wrap{max-width:900px;margin:0 auto;padding:24px 12px 130px}
+
+/* ── TRANSPORT NOTE ── */
+.transport-note{background:var(--blk3);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:.84rem;color:var(--muted)}
+.transport-note strong{color:var(--pk)}
+
+/* ── CATEGORY SECTION ── */
+.category{margin-bottom:28px}
+.cat-header{display:inline-block;background:var(--pk);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.12em;padding:8px 32px;border-radius:14px;margin-bottom:16px;text-align:center;width:100%;box-shadow:0 4px 20px rgba(232,0,111,.35)}
+
+/* ── GRID ── */
+.items-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ── CARD ── */
+.item-card{background:var(--card);border-radius:16px;border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 18px var(--shadow);transition:transform .2s,box-shadow .2s}
+.item-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(232,0,111,.25)}
+.card-img-wrap{position:relative;aspect-ratio:1;overflow:hidden;cursor:zoom-in}
+.card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;border-radius:0}
+.item-card:hover .card-img{transform:scale(1.05)}
+.card-name-badge{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 100%);padding:28px 10px 8px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.1em;color:#fff;text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.card-body{padding:10px 12px 12px;flex:1;display:flex;flex-direction:column;gap:6px}
+.card-title{font-size:.88rem;font-weight:700;color:var(--text);line-height:1.2}
+.card-sub{font-size:.72rem;color:var(--pk3);font-weight:600;margin-top:-2px}
+.card-desc{font-size:.73rem;color:var(--muted);line-height:1.4;flex:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px}
+.card-price{font-size:1.05rem;font-weight:700;color:var(--pk);font-family:'Bebas Neue',sans-serif;letter-spacing:.04em}
+.qty-control{display:flex;align-items:center;border:1.5px solid var(--pk);border-radius:100px;overflow:hidden;flex-shrink:0;transition:box-shadow .2s}
+.qty-control.active{box-shadow:0 0 10px rgba(232,0,111,.4)}
+.qty-btn{width:28px;height:28px;background:transparent;border:none;color:var(--pk);font-size:1.05rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;line-height:1}
+.qty-btn:hover{background:var(--pk);color:white}
+.qty-input{width:34px;height:28px;border:none;text-align:center;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;color:var(--text);background:transparent;outline:none;-moz-appearance:textfield}
+.qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* ── CART BAR ── */
+.cart-bar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--pk);color:white;padding:14px 28px;border-radius:100px;box-shadow:0 8px 32px rgba(232,0,111,.5);display:flex;align-items:center;gap:12px;cursor:pointer;z-index:1000;white-space:nowrap;transition:transform .4s cubic-bezier(.175,.885,.32,1.275),box-shadow .2s;font-weight:600}
+.cart-bar.visible{transform:translateX(-50%) translateY(0)}
+.cart-bar:hover{background:var(--pk2);box-shadow:0 12px 40px rgba(232,0,111,.6)}
+.cart-total{background:rgba(0,0,0,.3);padding:4px 14px;border-radius:100px;font-weight:700;font-size:.88rem}
+
+/* ── LIGHTBOX ── */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:5000;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.lightbox.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lightbox-img{max-width:min(480px,90vw);max-height:78vh;border-radius:20px;object-fit:contain;box-shadow:0 0 60px rgba(232,0,111,.4),0 20px 60px rgba(0,0,0,.8);cursor:default;border:2px solid var(--pk)}
+.lightbox-name{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:white;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.12em;text-align:center;text-shadow:0 0 20px rgba(232,0,111,.8);white-space:nowrap}
+.lightbox-close{position:absolute;top:16px;right:16px;width:40px;height:40px;background:var(--pk);border:none;border-radius:50%;color:white;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;box-shadow:0 0 12px rgba(232,0,111,.5)}
+.lightbox-close:hover{background:var(--pk2)}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--blk2);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.175,.885,.32,1.275);border-top:2px solid var(--pk)}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:var(--blk2);border-bottom:1px solid var(--line);z-index:10}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--pk);letter-spacing:.08em}
+.modal-close{width:34px;height:34px;background:rgba(232,0,111,.15);border:1px solid var(--pk);border-radius:50%;cursor:pointer;font-size:1rem;color:var(--pk);display:flex;align-items:center;justify-content:center}
+.modal-body{padding:18px 22px}
+
+/* ── ORDER SUMMARY ── */
+.order-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.order-item:last-child{border-bottom:none}
+.order-name{flex:1;font-size:.9rem;color:var(--text)}
+.order-qty{font-size:.8rem;color:var(--pk);background:rgba(232,0,111,.12);border:1px solid var(--pk);padding:2px 10px;border-radius:100px;flex-shrink:0;font-weight:600}
+.order-price{font-weight:700;min-width:70px;text-align:right;font-size:.9rem;color:var(--pk)}
+.order-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0 4px;margin-top:4px;border-top:2px solid var(--pk)}
+.order-total-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;font-weight:700;color:var(--pk);letter-spacing:.04em}
+.empty-cart{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:2.8rem;margin-bottom:10px}
+
+/* ── FORM ── */
+.form-field{margin-bottom:14px}
+.form-field label{display:block;margin-bottom:5px;font-size:.8rem;font-weight:600;color:var(--pk3);letter-spacing:.06em;text-transform:uppercase}
+.form-field input,.form-field textarea,.form-field select{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--text);transition:border-color .2s;outline:none;background:var(--input-bg)}
+.form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--pk);box-shadow:0 0 0 3px rgba(232,0,111,.12)}
+.phone-row{display:flex;gap:8px}
+.phone-flag{display:flex;align-items:center;gap:6px;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:.9rem;white-space:nowrap;color:var(--muted);background:var(--input-bg);flex-shrink:0}
+.phone-row input{flex:1}
+
+/* ── BUTTONS ── */
+.btn-primary{width:100%;padding:15px;background:var(--pk);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.98rem;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:background .2s,transform .1s;margin-top:8px;box-shadow:0 4px 16px rgba(232,0,111,.35)}
+.btn-primary:hover{background:var(--pk2)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{background:#555;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{width:100%;padding:11px;background:transparent;color:var(--muted);border:1.5px solid var(--line);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;margin-top:8px;transition:border-color .2s,color .2s}
+.btn-ghost:hover{border-color:var(--pk);color:var(--pk)}
+.modal-note{text-align:center;font-size:.78rem;color:var(--muted);padding:14px 22px;border-top:1px solid var(--line)}
+
+/* ── SUCCESS ── */
+.success-screen{text-align:center;padding:36px 16px}
+.success-icon{font-size:2.8rem;margin-bottom:14px}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--pk);margin-bottom:8px;letter-spacing:.08em}
+.success-msg{color:var(--muted);font-size:.92rem;line-height:1.65}
+
+/* ── SPINNER ── */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── ADMIN ── */
+#adminPanel{display:none;max-width:980px;margin:0 auto;padding:24px 14px 60px}
+.admin-header{background:linear-gradient(135deg,var(--blk3),var(--blk2));border:1px solid var(--pk);border-radius:16px;padding:24px 26px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 4px 24px rgba(232,0,111,.2)}
+.admin-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--pk);letter-spacing:.08em}
+.admin-header p{color:var(--muted);font-size:.8rem;margin-top:2px}
+.admin-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:9px 20px;border-radius:100px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s;font-weight:500}
+.tab-btn.active{background:var(--pk);color:white;border-color:var(--pk);box-shadow:0 4px 12px rgba(232,0,111,.3)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 2px 12px var(--shadow)}
+.stat-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--pk);margin-top:2px;letter-spacing:.04em}
+.report-filter{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.report-filter select{padding:9px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);background:var(--card);outline:none;cursor:pointer}
+.report-filter select:focus{border-color:var(--pk)}
+.report-table{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.report-table table{width:100%;border-collapse:collapse}
+.report-table th{background:var(--pk);color:white;padding:12px 16px;text-align:left;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.report-table td{padding:12px 16px;border-bottom:1px solid var(--line);font-size:.88rem;color:var(--text)}
+.report-table tr:last-child td{border-bottom:none}
+.report-table tr:hover td{background:rgba(232,0,111,.06)}
+.report-summary{background:rgba(232,0,111,.08);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:14px;display:flex;gap:24px;flex-wrap:wrap}
+.report-summary .rs-item .rs-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.report-summary .rs-item .rs-val{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--pk);letter-spacing:.04em}
+.order-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.order-card-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:15px 20px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
+.order-card-head:hover{background:rgba(232,0,111,.06)}
+.order-meta{font-size:.8rem;color:var(--muted);margin-top:2px}
+.order-card-body{padding:16px 20px;display:none}.order-card-body.open{display:block}
+.order-badge{background:var(--pk);color:white;border-radius:100px;padding:4px 14px;font-size:.8rem;font-weight:700;white-space:nowrap}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:14px}
+.dl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.dv{font-size:.9rem;font-weight:500;color:var(--text)}
+.order-items-list{background:rgba(232,0,111,.06);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:.86rem}
+.order-items-list div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line);color:var(--text)}
+.order-items-list div:last-child{border-bottom:none;font-weight:700;color:var(--pk)}
+.blocked-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.blocked-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.blocked-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(232,0,111,.07);border:1px solid var(--line);border-radius:10px;font-size:.9rem}
+.blocked-row .bd-date{font-weight:600;color:var(--text)}.blocked-row .bd-note{color:var(--muted);font-size:.82rem}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.1rem;padding:2px 6px;border-radius:6px;transition:color .2s,background .2s}
+.btn-del:hover{color:#ff3333;background:rgba(255,0,0,.1)}
+.add-blocked-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.add-blocked-row input{flex:1;min-width:140px;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;background:var(--input-bg);color:var(--text)}
+.add-blocked-row input:focus{border-color:var(--pk)}
+.btn-add-block{padding:10px 20px;background:var(--pk);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(232,0,111,.3)}
+.btn-add-block:hover{background:var(--pk2)}
+.contacts-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+.contacts-section h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--pk);margin-bottom:4px;letter-spacing:.08em}
+.contacts-section p{font-size:.84rem;color:var(--muted);margin-bottom:16px}
+.contacts-table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:14px}
+.contacts-table th{background:var(--pk);color:white;padding:10px 12px;text-align:left;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+.contacts-table td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--text)}
+.contacts-table tr:last-child td{border-bottom:none}
+.contacts-table tr:hover td{background:rgba(232,0,111,.05)}
+.voided-tag{background:#555;color:white;border-radius:100px;padding:2px 8px;font-size:.72rem;font-weight:600}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-btn{padding:9px 18px;border-radius:10px;border:1.5px solid var(--pk);color:var(--pk);background:transparent;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.export-btn:hover{background:var(--pk);color:white}
+#adminLoginPage{display:none;background:var(--bg);min-height:100vh}
+.admin-login{max-width:360px;margin:80px auto;background:var(--card);border:1px solid var(--pk);border-radius:20px;padding:36px 28px;text-align:center;box-shadow:0 8px 40px rgba(232,0,111,.2)}
+.admin-login h2{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--pk);margin-bottom:6px;letter-spacing:.08em}
+.admin-login p{color:var(--muted);font-size:.85rem;margin-bottom:24px}
+.admin-logout{background:transparent;border:1.5px solid rgba(255,255,255,.25);color:white;padding:8px 18px;border-radius:100px;cursor:pointer;font-size:.82rem;transition:border-color .2s}
+.admin-logout:hover{border-color:white}
+.refresh-btn{background:var(--pk);color:white;border:none;padding:10px 20px;border-radius:100px;cursor:pointer;font-size:.85rem;font-weight:700;transition:background .2s;box-shadow:0 4px 12px rgba(232,0,111,.3)}
+.refresh-btn:hover{background:var(--pk2)}
+.no-orders{text-align:center;padding:60px 20px;color:var(--muted)}
+.order-card.voided{opacity:.7}
+.order-card.voided .order-card-head{background:repeating-linear-gradient(135deg,rgba(232,0,111,.04),rgba(232,0,111,.04) 10px,var(--card) 10px,var(--card) 20px)}
+.badge-voided{background:#555;color:white;border-radius:100px;padding:4px 12px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.void-reason{font-size:.8rem;color:#ff6666;margin-top:6px;font-style:italic}
+.btn-void{padding:6px 14px;font-size:.78rem;border:1.5px solid #ff3333;color:#ff3333;background:transparent;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+.btn-void:hover{background:#ff3333;color:white}
+.btn-restore{padding:6px 14px;font-size:.78rem;border:1.5px solid var(--muted);color:var(--muted);background:transparent;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+.btn-restore:hover{border-color:var(--pk);color:var(--pk)}
+
+/* ── INVOICE ── */
+#invoiceOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;align-items:center;justify-content:center;padding:16px}
+#invoiceOverlay.open{display:flex}
+.invoice-modal{background:#fff;border-radius:20px;width:100%;max-width:680px;max-height:95vh;overflow-y:auto;animation:slideUp .3s ease}
+.invoice-actions{display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid #eee;flex-wrap:wrap}
+.inv-btn{padding:9px 18px;border-radius:10px;border:1.5px solid #ddd;background:white;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;font-weight:500;transition:all .2s;color:#333}
+.inv-btn:hover{border-color:#e8006f;color:#e8006f}
+.inv-btn.primary{background:#e8006f;color:white;border-color:#e8006f}
+.inv-btn.primary:hover{background:#ff3399}
+.invoice-body{padding:32px 36px}
+.inv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.inv-logo{width:80px;height:80px;object-fit:contain;border-radius:50%}
+.inv-brand{text-align:right}
+.inv-brand h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#e8006f;letter-spacing:.08em}
+.inv-brand p{font-size:.78rem;color:#999;margin-top:2px}
+.inv-title{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#999;margin-bottom:4px}
+.inv-id{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#111;letter-spacing:.06em}
+.inv-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;background:#fdf0f7;border-radius:12px;padding:18px 20px;margin-bottom:24px}
+.inv-meta-grid .im-label{font-size:.72rem;color:#999;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.inv-edit{border:none;border-bottom:1.5px dashed #ddd;background:transparent;font-family:'DM Sans',sans-serif;font-size:.92rem;color:#111;outline:none;width:100%;padding:2px 0;transition:border-color .2s}
+.inv-edit:focus{border-bottom-color:#e8006f}
+.inv-items-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.88rem}
+.inv-items-table th{padding:10px 12px;background:#111;color:white;text-align:left;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase}
+.inv-items-table td{padding:10px 12px;border-bottom:1px solid #eee;color:#333}
+.inv-items-table tr:last-child td{border-bottom:none}
+.inv-items-table .qty-cell input{width:50px;text-align:center;border:1.5px solid #ddd;border-radius:8px;padding:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none}
+.inv-items-table .qty-cell input:focus{border-color:#e8006f}
+.inv-totals{margin-left:auto;width:260px;font-size:.9rem}
+.inv-totals .it-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee}
+.inv-totals .it-row:last-child{border-bottom:none;font-weight:700;font-size:1rem;color:#e8006f}
+.inv-totals .it-row input{width:90px;text-align:right;border:none;border-bottom:1.5px dashed #ddd;font-family:'DM Sans',sans-serif;font-size:.9rem;color:#333;outline:none;background:transparent}
+.inv-totals .it-row input:focus{border-bottom-color:#e8006f}
+.inv-notes-section{margin-top:20px;border-top:1px solid #eee;padding-top:16px}
+.inv-notes-section label{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:#999;display:block;margin-bottom:6px}
+.inv-notes-section textarea{width:100%;border:1.5px dashed #ddd;border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:#333;resize:vertical;outline:none;min-height:70px}
+.inv-notes-section textarea:focus{border-color:#e8006f}
+.inv-footer{margin-top:28px;text-align:center;font-size:.76rem;color:#999;padding-top:16px;border-top:1px solid #eee}
+
+@media print{
+  body>*{display:none!important}
+  #invoiceOverlay{display:block!important;position:static!important;background:none!important;padding:0!important}
+  .invoice-modal{max-height:none!important;border-radius:0!important;box-shadow:none!important}
+  .invoice-actions{display:none!important}
+  .inv-edit,.inv-totals .it-row input,.inv-items-table .qty-cell input,.inv-notes-section textarea{border:none!important;border-bottom:none!important}
+}
+@media(min-width:560px){.modal{border-radius:24px;margin:auto}.modal-overlay{align-items:center}}
+/* ── SITE FOOTER ── */
+.site-footer{background:var(--blk2);border-top:2px solid var(--pk);padding:48px 20px 32px;color:var(--muted);font-size:.88rem}
+.footer-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:36px}
+.footer-logo-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.footer-logo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--pk)}
+.footer-brand{font-family:'Playfair Display',serif;font-style:italic;font-size:1.4rem;color:var(--pk)}
+.footer-tagline{font-size:.78rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.footer-section h4{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--pk);letter-spacing:.12em;margin-bottom:12px}
+.footer-section p,.footer-section a{color:var(--muted);font-size:.85rem;line-height:1.8;display:block;text-decoration:none;transition:color .2s}
+.footer-section a:hover{color:var(--pk)}
+.footer-section .contact-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.footer-section .contact-row span:first-child{flex-shrink:0;font-size:1rem}
+.footer-bottom{max-width:900px;margin:32px auto 0;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:.76rem;color:var(--muted)}
+.footer-bottom a{color:var(--pk);text-decoration:none}
+
+/* ── CONTRACT MODAL ── */
+#contractOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:4000;align-items:center;justify-content:center;padding:12px}
+#contractOverlay.open{display:flex}
+.contract-wrap{background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:96vh;overflow-y:auto;animation:slideUp .3s ease;font-family:'DM Sans',sans-serif;color:#111}
+.contract-actions{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid #eee;flex-wrap:wrap;position:sticky;top:0;background:#fff;z-index:10}
+.ct-btn{padding:8px 16px;border-radius:10px;border:1.5px solid #ddd;background:white;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;font-weight:500;transition:all .2s;color:#333}
+.ct-btn:hover{border-color:#e8006f;color:#e8006f}
+.ct-btn.primary{background:#e8006f;color:white;border-color:#e8006f}
+.contract-body{padding:32px 36px}
+.ct-header{text-align:center;border-bottom:2px solid #e8006f;padding-bottom:20px;margin-bottom:24px}
+.ct-logo{width:80px;height:80px;object-fit:cover;border-radius:50%;border:2px solid #e8006f;display:block;margin:0 auto 10px}
+.ct-header h2{font-family:'Playfair Display',serif;font-style:italic;font-size:1.8rem;color:#e8006f}
+.ct-header p{font-size:.78rem;color:#888;margin-top:2px}
+.ct-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#111;letter-spacing:.1em;text-align:center;margin-bottom:20px}
+.ct-section{margin-bottom:18px}
+.ct-section h4{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:#e8006f;margin-bottom:6px;text-transform:uppercase}
+.ct-section p,.ct-section li{font-size:.85rem;color:#333;line-height:1.7}
+.ct-section ul{padding-left:18px}
+.ct-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin:16px 0}
+.ct-field{border-bottom:1.5px solid #ddd;padding:8px 0 4px;font-size:.88rem;color:#111;min-height:32px}
+.ct-field-label{font-size:.72rem;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.ct-sig-box{border:2px dashed #e8006f;border-radius:10px;padding:20px;text-align:center;margin:16px 0;background:#fdf0f7}
+.ct-sig-box p{font-size:.8rem;color:#999;margin-bottom:8px}
+.ct-sig-input{font-family:'Playfair Display',serif;font-style:italic;font-size:1.4rem;width:100%;border:none;border-bottom:2px solid #e8006f;padding:6px 0;text-align:center;background:transparent;outline:none;color:#111}
+.ct-sig-input::placeholder{color:#ccc;font-style:italic}
+.ct-date-field{font-size:.88rem;width:100%;border:none;border-bottom:1.5px solid #ddd;padding:4px 0;background:transparent;outline:none;color:#111;margin-top:8px}
+.ct-initials-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+.ct-initials-input{width:80px;border:none;border-bottom:1.5px solid #e8006f;padding:4px 0;text-align:center;font-size:.88rem;background:transparent;outline:none;color:#111;font-weight:700}
+.ct-initials-label{font-size:.78rem;color:#888}
+@media print{
+  body>*{display:none!important}
+  #contractOverlay{display:block!important;position:static!important;background:none!important;padding:0!important}
+  .contract-wrap{max-height:none!important;border-radius:0!important}
+  .contract-actions{display:none!important}
+}
+@media(max-width:520px){.ct-field-row{grid-template-columns:1fr}.contract-body{padding:20px 16px}}
+
+/* ── RECEIPT ── */
+#receiptOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:4000;align-items:center;justify-content:center;padding:16px}
+#receiptOverlay.open{display:flex}
+.receipt-wrap{background:#fff;border-radius:16px;width:100%;max-width:360px;max-height:95vh;overflow-y:auto;animation:slideUp .3s ease;font-family:'DM Sans',sans-serif}
+.receipt-actions{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid #eee;flex-wrap:wrap}
+.rct-btn{padding:8px 16px;border-radius:10px;border:1.5px solid #ddd;background:white;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;font-weight:500;transition:all .2s;color:#333}
+.rct-btn:hover{border-color:#e8006f;color:#e8006f}
+.rct-btn.primary{background:#e8006f;color:white;border-color:#e8006f}
+.rct-btn.primary:hover{background:#ff3399}
+.receipt-body{padding:24px 22px}
+.rct-logo{width:72px;height:72px;object-fit:contain;border-radius:50%;display:block;margin:0 auto 8px;border:2px solid #e8006f}
+.rct-biz{text-align:center;margin-bottom:14px}
+.rct-biz h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#e8006f;letter-spacing:.1em}
+.rct-biz p{font-size:.72rem;color:#888;letter-spacing:.05em}
+.rct-dash{border:none;border-top:2px dashed #ddd;margin:12px 0}
+.rct-dash.solid{border-top:2px solid #111}
+.rct-meta{font-size:.78rem;margin-bottom:12px}
+.rct-meta div{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #f0f0f0}
+.rct-meta div:last-child{border-bottom:none}
+.rct-meta span.lbl{color:#999;text-transform:uppercase;font-size:.7rem;letter-spacing:.06em}
+.rct-meta span.val{font-weight:600;color:#111}
+.rct-items-tbl{width:100%;border-collapse:collapse;font-size:.8rem;margin:8px 0}
+.rct-items-tbl th{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#aaa;padding:4px 0;border-bottom:1px solid #eee;text-align:left}
+.rct-items-tbl th:last-child,.rct-items-tbl td:last-child{text-align:right}
+.rct-items-tbl td{padding:5px 0;border-bottom:1px dashed #f5f5f5;color:#333;font-size:.8rem}
+.rct-items-tbl tr:last-child td{border-bottom:none}
+.rct-totals-section{margin-top:10px}
+.rct-tot-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.83rem;color:#555}
+.rct-tot-row.grand{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;color:#e8006f;letter-spacing:.06em;padding:8px 0 2px;border-top:2px solid #111;margin-top:4px}
+.rct-tax-line{display:flex;align-items:center;gap:6px;padding:4px 0}
+.rct-tax-line label{font-size:.76rem;color:#999;flex-shrink:0}
+.rct-tax-line input[type=number]{width:64px;border:1.5px solid #ddd;border-radius:8px;padding:3px 6px;font-family:'DM Sans',sans-serif;font-size:.8rem;outline:none;text-align:center}
+.rct-tax-line input[type=number]:focus{border-color:#e8006f}
+.rct-tax-line span{margin-left:auto;font-weight:600;color:#333;font-size:.83rem}
+.rct-footer{text-align:center;margin-top:16px;padding-top:12px;border-top:2px dashed #ddd}
+.rct-footer .ty{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:#e8006f;letter-spacing:.12em}
+.rct-footer p{font-size:.72rem;color:#aaa;line-height:1.6;margin-top:4px}
+.rct-oid{font-size:.66rem;color:#ccc;margin-top:8px;letter-spacing:.08em;text-align:center}
+@media print{
+  body>*{display:none!important}
+  #receiptOverlay{display:block!important;position:static!important;background:none!important;padding:0!important}
+  .receipt-wrap{max-height:none!important;border-radius:0!important;max-width:100%!important}
+  .receipt-actions{display:none!important}
+  .rct-tax-line input{border:none!important}
+}
+</style>
+</head>
+<body>
+
+<button class="dm-toggle" id="dmToggle" title="Toggle light/dark">🌙</button>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="" onclick="event.stopPropagation()">
+  <div class="lightbox-name" id="lightboxName"></div>
+</div>
+
+<!-- ═══ CUSTOMER PAGE ═══ -->
+<div id="customerPage">
+  <header class="header">
+    <img src="232784.png" alt="Zilicious Catering" class="logo-img" onerror="this.style.display='none'">
+    <div class="brand-name">Zilicious Catering</div>
+    <p class="tagline">Luxury Catering · Premium Events</p>
+    <span class="price-note">All prices per large tray · USD</span>
+    <div class="qr-in-header">
+      <img src="qr-code.png" alt="Scan to order">
+      <p>Scan to open &amp; share menu</p>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <div class="transport-note">
+      <span style="font-size:1.2rem;flex-shrink:0">🚗</span>
+      <span><strong>Transport:</strong> $1.00 within 50-mile radius. Beyond 50 miles: <strong>$1.50 per mile</strong>.</span>
+    </div>
+
+    <!-- CARBS -->
+    <div class="category">
+      <div class="cat-header">🥖 CARBS</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-pilau.jpg" alt="Pilau Rice"><div class="card-name-badge">PILAU RICE</div></div><div class="card-body"><div class="card-title">Pilau Rice</div><div class="card-desc">A flavorful spiced rice dish that combines aromatic spices with beef or chicken.</div><div class="card-footer"><span class="card-price">$130</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-coconut-rice.jpg" alt="Coconut Rice"><div class="card-name-badge">COCONUT RICE</div></div><div class="card-body"><div class="card-title">Coconut Rice</div><div class="card-desc">Also known as "Wali wa Nazi," a delicious fragrant rice cooked with coconut milk and coconut flakes.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-plain-rice.jpg" alt="Plain Rice"><div class="card-name-badge">PLAIN RICE</div></div><div class="card-body"><div class="card-title">Plain Rice</div><div class="card-desc">Fluffy long grain rice with a scent of rose water.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-bhajias.jpg" alt="Bhajias"><div class="card-name-badge">BHAJIAS</div></div><div class="card-body"><div class="card-title">Bhajias</div><div class="card-desc">Thinly sliced potatoes coated in seasoned gram flour batter and deep-fried until golden.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chips-masala.jpg" alt="Chips Masala"><div class="card-name-badge">CHIPS MASALA</div></div><div class="card-body"><div class="card-title">Chips Masala</div><div class="card-desc">Crispy fries seasoned in a blend of masala spices and cilantro.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-viazi-karai.jpg" alt="Viazi Karai"><div class="card-name-badge">VIAZI KARAI</div></div><div class="card-body"><div class="card-title">Viazi Karai</div><div class="card-desc">A beloved coastal Kenyan street food of deep-fried, spiced potatoes.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chapo-white.jpg" alt="Chapo White"><div class="card-name-badge">CHAPO (WHITE)</div></div><div class="card-body"><div class="card-title">Chapo (White)</div><div class="card-desc">Soft, flaky Kenyan flatbread known for its layered texture and chewy consistency.</div><div class="card-footer"><span class="card-price">$2 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chapo-brown.jpg" alt="Chapo Brown"><div class="card-name-badge">CHAPO (BROWN)</div></div><div class="card-body"><div class="card-title">Chapo (Brown)</div><div class="card-desc">Kenyan-style flatbread made using brown (whole wheat) flour.</div><div class="card-footer"><span class="card-price">$2.50 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- PROTEINS -->
+    <div class="category">
+      <div class="cat-header">🍖 PROTEINS</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-mbuzi.jpg" alt="Mbuzi Wet Fry"><div class="card-name-badge">MBUZI WET FRY</div></div><div class="card-body"><div class="card-title">Mbuzi Wet Fry</div><div class="card-desc">Tender goat meat cooked in a rich, spiced gravy with vegetables.</div><div class="card-footer"><span class="card-price">$300</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-goat-curry.jpg" alt="Goat Curry"><div class="card-name-badge">GOAT CURRY</div></div><div class="card-body"><div class="card-title">Goat Curry</div><div class="card-desc">Rich, flavorful goat meat simmered in a spiced curry sauce.</div><div class="card-footer"><span class="card-price">$280</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-beef-stew.jpg" alt="Beef Stew"><div class="card-name-badge">BEEF STEW</div></div><div class="card-body"><div class="card-title">Beef Stew</div><div class="card-desc">Hearty Kenyan beef stew with savory broth, tender beef and aromatic spices.</div><div class="card-footer"><span class="card-price">$260</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-curry.jpg" alt="Chicken Curry"><div class="card-name-badge">CHICKEN CURRY</div></div><div class="card-body"><div class="card-title">Chicken Curry Stew</div><div class="card-desc">Tender chicken pieces simmered in a flavorful, aromatic curry sauce.</div><div class="card-footer"><span class="card-price">$220</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-teriyaki.jpg" alt="Chicken Teriyaki"><div class="card-name-badge">CHICKEN TERIYAKI</div></div><div class="card-body"><div class="card-title">Chicken Teriyaki Drumsticks</div><div class="card-sub">40 pcs</div><div class="card-desc">Sweet and savory Japanese-inspired glazed drumsticks.</div><div class="card-footer"><span class="card-price">$150</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-tikka.jpg" alt="Chicken Tikka"><div class="card-name-badge">CHICKEN TIKKA</div></div><div class="card-body"><div class="card-title">Chicken Tikka Drumsticks</div><div class="card-sub">40 pcs</div><div class="card-desc">Vibrant, tender, juicy meat with slightly charred edges.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-baked-chicken.jpg" alt="Baked Chicken"><div class="card-name-badge">BAKED CHICKEN</div></div><div class="card-body"><div class="card-title">Baked Chicken Drumsticks</div><div class="card-sub">40 pcs</div><div class="card-desc">Crispy golden-brown skin with tender, juicy meat seasoned with herbs and spices.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- VEGGIES -->
+    <div class="category">
+      <div class="cat-header">🥦 VEGGIES</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-kachumbari.jpg" alt="Kachumbari"><div class="card-name-badge">KACHUMBARI</div></div><div class="card-body"><div class="card-title">Kachumbari</div><div class="card-desc">Fresh tomato, onion, cilantro and jalapeño salsa.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-mixed-veggies.jpg" alt="Mixed Veggies"><div class="card-name-badge">MIXED VEGGIES</div></div><div class="card-body"><div class="card-title">Mixed Veggies</div><div class="card-desc">Colorful, nutritious vegetables cooked together in a savory sauce.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-creamy-spinach.jpg" alt="Creamy Spinach"><div class="card-name-badge">CREAMY SPINACH</div></div><div class="card-body"><div class="card-title">Creamy Spinach</div><div class="card-desc">Fresh spinach in a velvety sauce made with cream, butter and seasonings.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-creamy-mushrooms.jpg" alt="Creamy Mushrooms"><div class="card-name-badge">CREAMY MUSHROOMS</div></div><div class="card-body"><div class="card-title">Creamy Mushrooms</div><div class="card-desc">Fresh mushrooms sautéed in butter and finished in a rich cream sauce.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-coconut-beans.jpg" alt="Coconut Beans"><div class="card-name-badge">COCONUT BEANS</div></div><div class="card-body"><div class="card-title">Coconut Beans</div><div class="card-desc">"Maharagwe ya Nazi" — beans in a rich, creamy coconut milk sauce.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-lentils.jpg" alt="Lentils"><div class="card-name-badge">LENTIL STEW</div></div><div class="card-body"><div class="card-title">Lentils</div><div class="card-desc">Hearty, nutritious lentil stew with vegetables, broth and spices.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-salad-platter.jpg" alt="Salad Platter"><div class="card-name-badge">SALAD PLATTER</div></div><div class="card-body"><div class="card-title">Salad Platter</div><div class="card-desc">A diverse assortment of various fresh vegetables.</div><div class="card-footer"><span class="card-price">$80</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- SNACKS & FRUITS -->
+    <div class="category">
+      <div class="cat-header">🥟 SNACKS &amp; FRUITS</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-samosas.jpg" alt="Beef Samosas"><div class="card-name-badge">BEEF SAMOSAS</div></div><div class="card-body"><div class="card-title">Beef Samosas</div><div class="card-sub">50 pcs</div><div class="card-desc">Savory pastries filled with spiced meat and vegetables in a crispy shell.</div><div class="card-footer"><span class="card-price">$125</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-fruit-platter.jpg" alt="Fruit Platter"><div class="card-name-badge">FRUIT PLATTER</div></div><div class="card-body"><div class="card-title">Fruit Platter</div><div class="card-desc">A refreshing colorful assortment of seasonal fresh fruits.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-mahamris.jpg" alt="Mahamris"><div class="card-name-badge">MAHAMRIS</div></div><div class="card-body"><div class="card-title">Mahamris</div><div class="card-desc">Kenyan doughnuts made with coconut milk, cardamom and wheat flour.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-sausages.jpg" alt="Sausages"><div class="card-name-badge">FC SAUSAGES</div></div><div class="card-body"><div class="card-title">Farmers Choice Sausages</div><div class="card-desc">Thick, seasoned minced pork or beef sausages with a natural casing that crisps when fried.</div><div class="card-footer"><span class="card-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-kebabs.jpg" alt="Kebabs"><div class="card-name-badge">KEBABS</div></div><div class="card-body"><div class="card-title">Kebabs</div><div class="card-desc">Deep-fried spiced minced meat coated in egg and breadcrumbs, fried golden.</div><div class="card-footer"><span class="card-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-meatpies.jpg" alt="Meatpies"><div class="card-name-badge">MEATPIES</div></div><div class="card-body"><div class="card-title">Meatpies</div><div class="card-desc">Savory pastries filled with seasoned minced meat in a golden, flaky shell.</div><div class="card-footer"><span class="card-price">$3 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- KIDS -->
+    <div class="category">
+      <div class="cat-header">🧒 KIDS</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chicken-nuggets.jpg" alt="Chicken Nuggets"><div class="card-name-badge">CHICKEN NUGGETS</div></div><div class="card-body"><div class="card-title">Chicken Nuggets</div><div class="card-desc">Bite-sized chicken, breaded and deep-fried until golden and crispy.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-fries.jpg" alt="Fries"><div class="card-name-badge">FRENCH FRIES</div></div><div class="card-body"><div class="card-title">Fries</div><div class="card-desc">Golden brown and crispy on the outside, soft and fluffy inside.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-pasta-meatballs.jpg" alt="Pasta Meatballs"><div class="card-name-badge">PASTA &amp; MEATBALLS</div></div><div class="card-body"><div class="card-title">Pasta 'N' Meatballs</div><div class="card-desc">Pasta and meatballs in a tomato sauce with herbs and spices.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-mac-cheese.jpg" alt="Mac N Cheese"><div class="card-name-badge">MAC N CHEESE</div></div><div class="card-body"><div class="card-title">Mac N Cheese</div><div class="card-desc">Classic comfort food — elbow macaroni in a creamy, indulgent cheese sauce.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- BEVERAGES -->
+    <div class="category">
+      <div class="cat-header">☕ BEVERAGES</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chai-masala.jpg" alt="Chai Masala"><div class="card-name-badge">CHAI MASALA</div></div><div class="card-body"><div class="card-title">Chai Masala</div><div class="card-sub">50 cups</div><div class="card-desc">Strong Kenyan black tea blended with cinnamon, cardamom, ginger, milk and sugar.</div><div class="card-footer"><span class="card-price">$120</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chai.jpg" alt="Chai"><div class="card-name-badge">CHAI</div></div><div class="card-body"><div class="card-title">Chai</div><div class="card-sub">50 cups</div><div class="card-desc">Black tea brewed with cloves, spices, milk and sugar.</div><div class="card-footer"><span class="card-price">$100</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- CHAFERS -->
+    <div class="category">
+      <div class="cat-header">✨ CHAFERS</div>
+      <div class="items-grid">
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chafer-gold.jpg" alt="Gold Chafer"><div class="card-name-badge">GOLD LUXURY</div></div><div class="card-body"><div class="card-title">Chafing Dishes (Gold Luxury)</div><div class="card-desc">Premium gold-finish chafing dishes — elegant and statement-making for luxury events.</div><div class="card-footer"><span class="card-price">$15 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+        <div class="item-card"><div class="card-img-wrap"><img class="card-img" loading="lazy" onclick="expandImg(this)" src="img-chafer-silver.jpg" alt="Silver Chafer"><div class="card-name-badge">SILVER</div></div><div class="card-body"><div class="card-title">Chafing Dishes (Silver)</div><div class="card-desc">Classic silver luxury chafing dishes with ornate legs — timeless and sophisticated.</div><div class="card-footer"><span class="card-price">$10 each</span><div class="qty-control"><button class="qty-btn" onclick="adj(this,-1)">−</button><input class="qty-input" type="number" value="0" min="0" onchange="setQty(this)"><button class="qty-btn" onclick="adj(this,1)">+</button></div></div></div></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── SITE FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo-wrap">
+        <img src="232784.png" class="footer-logo" alt="Zilicious Catering" onerror="this.style.display='none'">
+        <div class="footer-brand">Zilicious Catering</div>
+        <div class="footer-tagline">Luxury Catering · Premium Events</div>
+        <p style="margin-top:10px;font-size:.8rem;line-height:1.6">Making every event unforgettable — from intimate gatherings to grand celebrations.</p>
+        <button onclick="openContract()" style="margin-top:14px;padding:9px 20px;background:var(--pk);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#ff3399'" onmouseout="this.style.background='#e8006f'">📄 View Service Contract</button>
+      </div>
+      <div class="footer-section">
+        <h4>About Us</h4>
+        <p>Zilicious Catering is a premier catering company dedicated to delivering exceptional culinary experiences. We specialize in Kenyan and fusion cuisine crafted from the finest ingredients, served with elegance and warmth.</p>
+        <p style="margin-top:8px">Whether it's a wedding, corporate event, birthday, or family gathering — we bring the flavors, you bring the guests.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Us</h4>
+        <p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">Send us your contact details and we'll update this section for you.</p>
+        <div class="contact-row"><span>📞</span><span id="footerPhone">—</span></div>
+        <div class="contact-row"><span>📧</span><span id="footerEmail">—</span></div>
+        <div class="contact-row"><span>📍</span><span id="footerAddress">—</span></div>
+        <div class="contact-row"><span>🌐</span><a href="https://zilicious-im2e.vercel.app" id="footerWeb" target="_blank">zilicious-im2e.vercel.app</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Zilicious Catering. All rights reserved.</span>
+      <span>Made with 💗 for luxury events</span>
+    </div>
+  </footer>
+
+  <!-- ── CONTRACT MODAL ── -->
+  <div id="contractOverlay">
+    <div class="contract-wrap">
+      <div class="contract-actions">
+        <button class="ct-btn" onclick="closeContract()">✕ Close</button>
+        <button class="ct-btn" onclick="window.print()">🖨 Print Contract</button>
+      </div>
+      <div class="contract-body">
+        <div class="ct-header">
+          <img src="232784.png" class="ct-logo" onerror="this.style.display='none'">
+          <h2>Zilicious Catering</h2>
+          <p>Luxury Catering · Premium Events</p>
+        </div>
+        <div class="ct-title">Catering Services Agreement</div>
+
+        <div class="ct-section">
+          <h4>Parties</h4>
+          <p>This Catering Services Agreement ("Agreement") is entered into between <strong>Zilicious Catering</strong> ("Caterer") and the Client identified below.</p>
+          <div class="ct-field-row">
+            <div><div class="ct-field-label">Client Full Name</div><input class="ct-field" style="width:100%;border:none;border-bottom:1.5px solid #ddd;padding:4px 0;font-size:.88rem;outline:none;background:transparent" placeholder="Print name here"></div>
+            <div><div class="ct-field-label">Date</div><input type="date" class="ct-date-field"></div>
+            <div><div class="ct-field-label">Phone Number</div><input class="ct-field" style="width:100%;border:none;border-bottom:1.5px solid #ddd;padding:4px 0;font-size:.88rem;outline:none;background:transparent" placeholder="Phone number"></div>
+            <div><div class="ct-field-label">Event Date</div><input type="date" class="ct-date-field"></div>
+            <div><div class="ct-field-label">Event Location</div><input class="ct-field" style="width:100%;border:none;border-bottom:1.5px solid #ddd;padding:4px 0;font-size:.88rem;outline:none;background:transparent" placeholder="Venue / address"></div>
+            <div><div class="ct-field-label">Expected Guest Count</div><input class="ct-field" style="width:100%;border:none;border-bottom:1.5px solid #ddd;padding:4px 0;font-size:.88rem;outline:none;background:transparent" placeholder="Number of guests"></div>
+          </div>
+        </div>
+
+        <div class="ct-section">
+          <h4>Services</h4>
+          <p>Zilicious Catering agrees to provide catering services as outlined in the confirmed order/quote. The menu, quantities, and delivery details shall be as agreed upon at time of booking confirmation.</p>
+        </div>
+
+        <div class="ct-section">
+          <h4>Payment Terms</h4>
+          <ul>
+            <li>A <strong>50% deposit</strong> is required to confirm and secure your booking date.</li>
+            <li>The remaining <strong>50% balance</strong> is due on or before the event day, prior to service.</li>
+            <li>Payments may be made via [Payment Method — to be completed].</li>
+            <li>All prices are in USD and are final upon booking confirmation.</li>
+          </ul>
+        </div>
+
+        <div class="ct-section">
+          <h4>Cancellation Policy</h4>
+          <ul>
+            <li>Cancellations made <strong>14+ days</strong> before the event: deposit is refundable minus a 10% processing fee.</li>
+            <li>Cancellations made <strong>7–13 days</strong> before the event: 50% of deposit is forfeited.</li>
+            <li>Cancellations made <strong>less than 7 days</strong> before the event: deposit is non-refundable.</li>
+            <li>Zilicious Catering reserves the right to cancel in the event of unforeseen circumstances, with a full refund of all payments made.</li>
+          </ul>
+        </div>
+
+        <div class="ct-section">
+          <h4>Transport &amp; Delivery</h4>
+          <p>Delivery is available within a 50-mile radius at $1.00. Beyond 50 miles, an additional fee of $1.50 per mile applies. Client is responsible for providing accurate delivery address and access information.</p>
+        </div>
+
+        <div class="ct-section">
+          <h4>Dietary &amp; Allergen Responsibility</h4>
+          <p>The Client is responsible for informing Zilicious Catering of any dietary restrictions, allergies, or special requirements at time of booking. Zilicious Catering will make every reasonable effort to accommodate such requirements but cannot guarantee a completely allergen-free environment.</p>
+        </div>
+
+        <div class="ct-section">
+          <h4>Equipment &amp; Chafing Dishes</h4>
+          <p>Any chafing dishes, serving equipment, or rentals provided by Zilicious Catering remain the property of the Caterer. The Client is responsible for any damage or loss of equipment during the event.</p>
+        </div>
+
+        <div class="ct-section">
+          <h4>Liability</h4>
+          <p>Zilicious Catering's liability is limited to the total amount paid by the Client. The Caterer is not responsible for damages arising from circumstances beyond our reasonable control.</p>
+        </div>
+
+        <div class="ct-section">
+          <h4>Agreement &amp; Signature</h4>
+          <p>By signing below, the Client agrees to all terms and conditions set forth in this Agreement and confirms that the information provided is accurate.</p>
+
+          <div class="ct-sig-box">
+            <p>Client Signature — Please print your full name below</p>
+            <input class="ct-sig-input" placeholder="Print full name here" type="text">
+            <div style="display:flex;justify-content:space-between;margin-top:16px;gap:20px;flex-wrap:wrap">
+              <div style="flex:1;min-width:160px">
+                <div class="ct-field-label" style="font-size:.72rem;color:#aaa;text-transform:uppercase;letter-spacing:.08em">Date Signed</div>
+                <input type="date" class="ct-date-field" style="width:100%">
+              </div>
+              <div style="flex:1;min-width:160px">
+                <div class="ct-initials-row"><input class="ct-initials-input" placeholder="Initials" maxlength="4"><span class="ct-initials-label">Client initials confirming all pages read</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee">
+            <div class="ct-field-label" style="font-size:.72rem;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Authorized — Zilicious Catering</div>
+            <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:#e8006f;border-bottom:1.5px solid #ddd;padding-bottom:6px">Zilicious Catering</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px dashed #eee;font-size:.74rem;color:#aaa">
+          Zilicious Catering · Luxury Catering &amp; Premium Events · zilicious-im2e.vercel.app
+        </div>
+      </div>
+    </div>
+  </div>
+    <span>🛒</span>
+    <span id="cartLabel">0 items</span>
+    <span class="cart-total" id="cartTotal">$0</span>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <span class="modal-title" id="modalTitle">Your Order</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="screenSummary">
+        <div class="modal-body" id="summaryBody"></div>
+        <div style="padding:0 22px 8px">
+          <button class="btn-primary" id="proceedBtn" onclick="showForm()">Confirm Order →</button>
+        </div>
+        <p class="modal-note">We'll contact you to confirm delivery &amp; payment.</p>
+      </div>
+      <div id="screenForm" style="display:none">
+        <div class="modal-body">
+          <div class="form-field"><label>Full Name *</label><input type="text" id="fName" placeholder="Your full name"></div>
+          <div class="form-field"><label>Phone Number *</label><div class="phone-row"><span class="phone-flag">🇺🇸 +1</span><input type="tel" id="fPhone" placeholder="(555) 000-0000" maxlength="14" oninput="fmtPhone(this)"></div></div>
+          <div class="form-field"><label>Event Date *</label><input type="date" id="fDate"></div>
+          <div class="form-field"><label>Delivery / Pickup Location</label><textarea id="fAddress" rows="2" placeholder="Street address or pickup point"></textarea></div>
+          <div class="form-field"><label>Dietary Requirements / Notes</label><textarea id="fNotes" rows="2" placeholder="e.g. nut allergy, halal only…"></textarea></div>
+          <button class="btn-primary" id="submitBtn" onclick="submitOrder()">Submit Order ✓</button>
+          <button class="btn-ghost" onclick="showSummary()">← Back to Order</button>
+        </div>
+        <p class="modal-note">We'll reach out shortly to finalize everything.</p>
+      </div>
+      <div id="screenSuccess" style="display:none">
+        <div class="modal-body">
+          <div class="success-screen">
+            <div class="success-icon">👑</div>
+            <div class="success-title">Order Received!</div>
+            <p class="success-msg" id="successMsg"></p>
+          </div>
+          <button class="btn-primary" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="adminLoginPage">
+  <div class="admin-login">
+    <div style="font-size:2rem;margin-bottom:10px">🔒</div>
+    <h2>Admin Access</h2>
+    <p>Zilicious Catering — Orders Dashboard</p>
+    <div class="form-field"><label>Password</label><input type="password" id="adminPwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+    <button class="btn-primary" onclick="adminLogin()">Sign In</button>
+    <p style="margin-top:14px;font-size:.8rem;color:var(--muted)"><a href="/" style="color:var(--pk)">← Back to menu</a></p>
+  </div>
+</div>
+
+<!-- ═══ ADMIN PANEL ═══ -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <div><h2>📋 Orders Dashboard</h2><p>Zilicious Catering · All submitted orders</p></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+      <button class="admin-logout" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </div>
+  <div class="stats-grid" id="adminStats">
+    <div class="stat-box"><div class="stat-label">Total Orders</div><div class="stat-val" id="statOrders">—</div></div>
+    <div class="stat-box"><div class="stat-label">Total Revenue</div><div class="stat-val" id="statRevenue">—</div></div>
+    <div class="stat-box"><div class="stat-label">This Month</div><div class="stat-val" id="statMonth">—</div></div>
+    <div class="stat-box"><div class="stat-label">Next Event</div><div class="stat-val" id="statNext" style="font-size:1.1rem;padding-top:8px">—</div></div>
+  </div>
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('orders',this)">📦 Orders</button>
+    <button class="tab-btn" onclick="switchTab('report',this)">📊 Sales Report</button>
+    <button class="tab-btn" onclick="switchTab('blocked',this)">🚫 Blocked Dates</button>
+    <button class="tab-btn" onclick="switchTab('voided',this)">🗑 Voided Orders</button>
+    <button class="tab-btn" onclick="switchTab('contacts',this)">📇 Contacts</button>
+  </div>
+  <div class="tab-pane active" id="tab-orders"><div id="ordersContainer"></div></div>
+  <div class="tab-pane" id="tab-report">
+    <div class="report-filter">
+      <label style="font-size:.85rem;font-weight:600;color:var(--pk)">Period:</label>
+      <select id="reportPeriod" onchange="renderReport()">
+        <option value="day">Today</option>
+        <option value="week">This Week</option>
+        <option value="month" selected>This Month</option>
+        <option value="year">This Year</option>
+      </select>
+    </div>
+    <div class="report-summary" id="reportSummary"></div>
+    <div class="report-table" id="reportTable" style="margin-top:16px"></div>
+  </div>
+  <div class="tab-pane" id="tab-blocked">
+    <div class="blocked-section">
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--pk);letter-spacing:.08em">Blocked / Booked Dates</h3>
+      <p style="font-size:.84rem;color:var(--muted);margin-top:4px">Customers won't be able to select these dates.</p>
+      <div class="add-blocked-row">
+        <input type="date" id="blockDateInput">
+        <input type="text" id="blockNoteInput" placeholder="Reason (optional)" style="flex:2">
+        <button class="btn-add-block" onclick="addBlockedDate()">+ Block Date</button>
+      </div>
+      <div class="blocked-list" id="blockedList"></div>
+    </div>
+  </div>
+  <div class="tab-pane" id="tab-voided"><div id="voidedContainer"></div></div>
+  <div class="tab-pane" id="tab-contacts">
+    <div class="contacts-section">
+      <h3>All Customer Contacts</h3>
+      <p>Every customer including voided orders — for appreciation messages and promotions.</p>
+      <div class="export-btns" style="margin-bottom:16px">
+        <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="export-btn" onclick="copyAllPhones()">📋 Copy All Phones</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="contacts-table" id="contactsTable">
+          <thead><tr><th>Name</th><th>Phone</th><th>Event Date</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="contactsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INVOICE MODAL ═══ -->
+<div id="invoiceOverlay">
+  <div class="invoice-modal">
+    <div class="invoice-actions">
+      <button class="inv-btn" onclick="closeInvoice()">✕ Close</button>
+      <button class="inv-btn" onclick="window.print()">🖨 Print</button>
+      <button class="inv-btn primary" onclick="shareInvoice()">📤 Share</button>
+    </div>
+    <div class="invoice-body" id="invoiceBody"></div>
+  </div>
+</div>
+
+<!-- ═══ RECEIPT MODAL ═══ -->
+<div id="receiptOverlay">
+  <div class="receipt-wrap">
+    <div class="receipt-actions">
+      <button class="rct-btn" onclick="closeReceipt()">✕ Close</button>
+      <button class="rct-btn" onclick="window.print()">🖨 Print</button>
+      <button class="rct-btn primary" onclick="shareReceipt()">📤 Share</button>
+    </div>
+    <div class="receipt-body" id="receiptBody"></div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzJgr-TKnm1gO-_XbOKtZ3Chgq8YO3Bp0eXeD28Kwc-LNhb4Onl9VbD_AWjiGgLJd3M/exec';
+const ADMIN_PASSWORD = 'Zilicious2027';
+
+/* Apply saved theme immediately before paint — default is dark */
+(function(){
+  const t = localStorage.getItem('zil_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+})();
+
+const cart = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+  /* DARK MODE */
+  const dmBtn = document.getElementById('dmToggle');
+  function updateDMIcon(){
+    if(!dmBtn) return;
+    dmBtn.textContent = document.documentElement.getAttribute('data-theme')==='light' ? '🌙' : '☀️';
+  }
+  updateDMIcon();
+  dmBtn && dmBtn.addEventListener('click', function(){
+    const next = document.documentElement.getAttribute('data-theme')==='light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('zil_theme', next);
+    updateDMIcon();
+  });
+
+  /* LIGHTBOX */
+  const lb = document.getElementById('lightbox');
+  if(lb) lb.addEventListener('click', function(e){ if(e.target===lb) closeLightbox(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeLightbox(); closeReceipt(); } });
+
+  /* MODAL backdrop */
+  const mo = document.getElementById('modalOverlay');
+  if(mo) mo.addEventListener('click', function(e){ if(e.target===mo) closeModal(); });
+
+  /* RECEIPT backdrop */
+  const ro = document.getElementById('receiptOverlay');
+  if(ro) ro.addEventListener('click', function(e){ if(e.target===ro) closeReceipt(); });
+
+  /* CONTRACT backdrop */
+  const co = document.getElementById('contractOverlay');
+  if(co) co.addEventListener('click', function(e){ if(e.target===co) closeContract(); });
+
+  /* DATE validation */
+  const fDate = document.getElementById('fDate');
+  if(fDate) fDate.addEventListener('change', validateDate);
+
+  /* ROUTING */
+  if(location.search.includes('admin')){
+    document.getElementById('customerPage').style.display = 'none';
+    if(sessionStorage.getItem('zil_admin')==='1'){
+      showAdminPanel();
+    } else {
+      document.getElementById('adminLoginPage').style.display = 'block';
+    }
+  }
+});
+
+/* ── LIGHTBOX ── */
+function expandImg(img){
+  const nameEl = img.closest('[class*="card"], .item');
+  const name = (nameEl.querySelector('.card-title, .item-name') || img).textContent.split('\n')[0].trim();
+  document.getElementById('lightboxImg').src = img.src;
+  document.getElementById('lightboxName').textContent = name;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  const lb = document.getElementById('lightbox');
+  if(lb) lb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── CART ── */
+function parsePrice(t){ return parseFloat(t.replace(/[^0-9.]/g,''))||0; }
+
+function adj(btn, delta){
+  const inp = btn.parentElement.querySelector('.qty-input');
+  inp.value = Math.max(0, parseInt(inp.value||0)+delta);
+  syncItem(inp);
+}
+function setQty(inp){
+  inp.value = Math.max(0, parseInt(inp.value)||0);
+  syncItem(inp);
+}
+function syncItem(inp){
+  const card = inp.closest('.item-card');
+  const name = card.querySelector('.card-title').childNodes[0].textContent.trim();
+  const priceEl = card.querySelector('.card-price');
+  const price = parsePrice(priceEl.textContent);
+  const qty = parseInt(inp.value)||0;
+  if(qty>0) cart[name]={qty,price}; else delete cart[name];
+  inp.closest('.qty-control').classList.toggle('active', qty>0);
+  updateCartBar();
+}
+function updateCartBar(){
+  let count=0, total=0;
+  Object.values(cart).forEach(i=>{ count+=i.qty; total+=i.qty*i.price; });
+  document.getElementById('cartLabel').textContent = count===1?'1 item':`${count} items`;
+  document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('cartBar').classList.toggle('visible', count>0);
+}
+
+/* ── ORDER MODAL ── */
+function openModal(){ showSummary(); document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+
+function showSummary(){
+  document.getElementById('modalTitle').textContent='Your Order';
+  document.getElementById('screenSummary').style.display='block';
+  document.getElementById('screenForm').style.display='none';
+  document.getElementById('screenSuccess').style.display='none';
+  const keys=Object.keys(cart), body=document.getElementById('summaryBody');
+  if(!keys.length){
+    body.innerHTML=`<div class="empty-cart"><div class="empty-icon">🛒</div><p>Your cart is empty.</p></div>`;
+    document.getElementById('proceedBtn').style.display='none'; return;
+  }
+  document.getElementById('proceedBtn').style.display='block';
+  let total=0, html='';
+  keys.forEach(n=>{ const {qty,price}=cart[n]; const sub=qty*price; total+=sub;
+    html+=`<div class="order-item"><span class="order-name">${n}</span><span class="order-qty">×${qty}</span><span class="order-price">$${sub.toLocaleString()}</span></div>`;
+  });
+  html+=`<div class="order-total-row"><span style="font-weight:600;color:var(--text)">Total</span><span class="order-total-value">$${total.toLocaleString()}</span></div>`;
+  body.innerHTML=html;
+}
+function showForm(){
+  if(!Object.keys(cart).length) return;
+  document.getElementById('modalTitle').textContent='Contact Details';
+  document.getElementById('screenSummary').style.display='none';
+  document.getElementById('screenForm').style.display='block';
+}
+function fmtPhone(i){
+  let v=i.value.replace(/\D/g,'').slice(0,10);
+  if(v.length>=7) v=`(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+  else if(v.length>=4) v=`(${v.slice(0,3)}) ${v.slice(3)}`;
+  else if(v.length>0) v=`(${v}`;
+  i.value=v;
+}
+function validateDate(){
+  const val=document.getElementById('fDate').value;
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if(blocked.find(b=>b.date===val)){
+    alert('Sorry, that date is already booked. Please choose a different date.');
+    document.getElementById('fDate').value='';
+  }
+}
+
+/* ── SUBMIT ORDER ── */
+async function submitOrder(){
+  const name=document.getElementById('fName').value.trim();
+  const phone=document.getElementById('fPhone').value.trim();
+  const date=document.getElementById('fDate').value;
+  if(!name||!phone||!date){ alert('Please fill in Full Name, Phone Number, and Event Date.'); return; }
+  const address=document.getElementById('fAddress').value.trim();
+  const notes=document.getElementById('fNotes').value.trim();
+  let total=0;
+  const items=Object.entries(cart).map(([n,{qty,price}])=>{ total+=qty*price; return {name:n,qty,price,subtotal:qty*price}; });
+  const order={id:'ORD-'+Date.now(), timestamp:new Date().toISOString(), customerName:name,
+    phone:'+1 '+phone, eventDate:date, address, notes, items, total};
+  const stored=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  stored.unshift(order);
+  localStorage.setItem('zil_orders', JSON.stringify(stored));
+  if(SHEET_URL){
+    const btn=document.getElementById('submitBtn');
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Submitting…';
+    try{ await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)}); }catch(e){}
+    btn.disabled=false; btn.innerHTML='Submit Order ✓';
+  }
+  const fmtDate=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('successMsg').innerHTML=`Thank you, <strong>${name}</strong>! Your order totalling <strong>$${total.toLocaleString()}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you at <strong>+1 ${phone}</strong> shortly.`;
+  document.getElementById('modalTitle').textContent='All Done!';
+  document.getElementById('screenForm').style.display='none';
+  document.getElementById('screenSuccess').style.display='block';
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  document.querySelectorAll('.qty-input').forEach(el=>el.value=0);
+  document.querySelectorAll('.qty-control').forEach(el=>el.classList.remove('active'));
+  updateCartBar();
+}
+
+/* ── ADMIN AUTH ── */
+function adminLogin(){
+  const pw=document.getElementById('adminPwInput').value;
+  if(pw===ADMIN_PASSWORD){
+    sessionStorage.setItem('zil_admin','1');
+    document.getElementById('adminLoginPage').style.display='none';
+    showAdminPanel();
+  } else {
+    document.getElementById('adminPwInput').value='';
+    document.getElementById('adminPwInput').placeholder='Incorrect — try again';
+    document.getElementById('adminPwInput').style.borderColor='#ff3333';
+  }
+}
+function adminLogout(){ sessionStorage.removeItem('zil_admin'); location.href='/?admin'; }
+
+/* ── ADMIN PANEL ── */
+function showAdminPanel(){
+  document.getElementById('adminPanel').style.display='block';
+  loadOrders(); renderBlockedDates();
+}
+
+/* ─ SHARED ORDERS FIX ─
+   localStorage is per-device. Customers ordering on their own phones
+   save to THEIR localStorage — you never see it on yours.
+   Fix: we POST each order to Google Sheets (already happening).
+   For the admin panel we fetch the sheet and merge with local orders
+   so ALL orders from ALL devices are visible. */
+async function fetchSheetOrders(){
+  if(!SHEET_URL) return [];
+  try {
+    // Google Apps Script doGet returns all orders as JSON
+    const res = await fetch(SHEET_URL + '?action=getOrders', {mode:'cors'});
+    if(!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data.orders) ? data.orders : [];
+  } catch(e){ return []; }
+}
+
+function mergeOrders(local, remote){
+  // Merge by order ID — remote wins for updates, local wins for new unsent orders
+  const map = {};
+  remote.forEach(o=>{ map[o.id]=o; });
+  local.forEach(o=>{ if(!map[o.id]) map[o.id]=o; else { /* keep voided/restore state from local */ if(o.voided!==undefined) map[o.id].voided=o.voided; if(o.voidedAt) map[o.id].voidedAt=o.voidedAt; if(o.voidReason!==undefined) map[o.id].voidReason=o.voidReason; } });
+  return Object.values(map).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+}
+
+async function loadOrders(){
+  // Show local orders immediately while fetching remote
+  let local = JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  renderOrdersAndStats(local);
+
+  // Then fetch from sheet and merge
+  const remote = await fetchSheetOrders();
+  if(remote.length){
+    const merged = mergeOrders(local, remote);
+    localStorage.setItem('zil_orders', JSON.stringify(merged));
+    renderOrdersAndStats(merged);
+  }
+}
+
+function renderOrdersAndStats(orders){
+  const active=orders.filter(o=>!o.voided);
+  const now=new Date();
+  const thisMonth=active.filter(o=>{ const d=new Date(o.timestamp); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  document.getElementById('statOrders').textContent=active.length;
+  document.getElementById('statRevenue').textContent=`$${active.reduce((s,o)=>s+o.total,0).toLocaleString()}`;
+  document.getElementById('statMonth').textContent=`$${thisMonth.reduce((s,o)=>s+o.total,0).toLocaleString()}`;
+  const next=active.filter(o=>new Date(o.eventDate+'T00:00:00')>=now).sort((a,b)=>new Date(a.eventDate)-new Date(b.eventDate))[0];
+  document.getElementById('statNext').textContent=next?new Date(next.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'None';
+  renderOrders(orders); renderReport();
+}
+function renderOrders(orders){
+  const active=orders.filter(o=>!o.voided);
+  const c=document.getElementById('ordersContainer');
+  if(!active.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">📭</div><p>No active orders yet.</p></div>`; return; }
+  c.innerHTML=active.map(o=>{
+    const i=orders.indexOf(o);
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const subD=new Date(o.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card">
+      <div class="order-card-head" onclick="toggleCard('a${i}')">
+        <div><strong style="color:var(--text)">${o.customerName}</strong><div class="order-meta">📅 ${evtD} · Submitted: ${subD}</div></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="inv-btn" style="padding:6px 14px;font-size:.78rem;color:var(--text);background:var(--card);border-color:var(--line)" onclick="event.stopPropagation();openInvoice(${i})">🧾 Invoice</button>
+          <button class="inv-btn" style="padding:6px 14px;font-size:.78rem;color:var(--text);background:var(--card);border-color:var(--line)" onclick="event.stopPropagation();openReceipt(${i})">🧾 Receipt</button>
+          <button class="btn-void" onclick="event.stopPropagation();voidOrder(${i})">🗑 Void</button>
+          <span class="order-badge">$${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-a${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Dietary / Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderVoided(){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const voided=orders.filter(o=>o.voided);
+  const c=document.getElementById('voidedContainer');
+  if(!voided.length){ c.innerHTML=`<div class="no-orders"><div style="font-size:2.5rem;margin-bottom:10px">✅</div><p>No voided orders.</p></div>`; return; }
+  c.innerHTML=`<p style="font-size:.84rem;color:var(--muted);margin-bottom:14px">Excluded from all revenue stats.</p>`+
+  voided.map(o=>{
+    const i=orders.indexOf(o);
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const voidD=new Date(o.voidedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    const itemsHtml=o.items.map(it=>`<div><span>${it.name} × ${it.qty}</span><span>$${it.subtotal.toLocaleString()}</span></div>`).join('')+
+      `<div><span style="font-weight:700">TOTAL</span><span>$${o.total.toLocaleString()}</span></div>`;
+    return `<div class="order-card voided">
+      <div class="order-card-head" onclick="toggleCard('v${i}')">
+        <div><strong style="text-decoration:line-through;color:var(--muted)">${o.customerName}</strong>
+          <div class="order-meta">📅 ${evtD} · Voided: ${voidD}</div>
+          ${o.voidReason?`<div class="void-reason">Reason: ${o.voidReason}</div>`:''}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn-restore" onclick="event.stopPropagation();restoreOrder(${i})">↩ Restore</button>
+          <span class="badge-voided">VOIDED · $${o.total.toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="order-card-body" id="card-v${i}">
+        <div class="detail-grid">
+          <div><div class="dl">Phone</div><div class="dv">${o.phone}</div></div>
+          <div><div class="dl">Order ID</div><div class="dv">${o.id}</div></div>
+          <div><div class="dl">Location</div><div class="dv">${o.address||'—'}</div></div>
+          <div><div class="dl">Notes</div><div class="dv">${o.notes||'—'}</div></div>
+        </div>
+        <div class="order-items-list">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function voidOrder(idx){
+  const reason=prompt('Reason for voiding this order (optional):');
+  if(reason===null) return;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  orders[idx].voided=true; orders[idx].voidedAt=new Date().toISOString(); orders[idx].voidReason=reason.trim();
+  localStorage.setItem('zil_orders',JSON.stringify(orders)); loadOrders();
+}
+function restoreOrder(idx){
+  if(!confirm('Restore this order?')) return;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  delete orders[idx].voided; delete orders[idx].voidedAt; delete orders[idx].voidReason;
+  localStorage.setItem('zil_orders',JSON.stringify(orders)); loadOrders(); renderVoided();
+}
+function toggleCard(id){ document.getElementById(`card-${id}`).classList.toggle('open'); }
+
+/* ── CONTACTS ── */
+function renderContacts(){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const sorted=[...orders].sort((a,b)=>a.customerName.localeCompare(b.customerName));
+  const tbody=document.getElementById('contactsBody');
+  if(!sorted.length){ tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--muted)">No contacts yet.</td></tr>`; return; }
+  tbody.innerHTML=sorted.map(o=>{
+    const evtD=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const status=o.voided?`<span class="voided-tag">Voided</span>`:`<span style="color:var(--pk);font-weight:700">Active</span>`;
+    return `<tr><td>${o.customerName}</td><td>${o.phone}</td><td>${evtD}</td><td>$${o.total.toLocaleString()}</td><td>${status}</td></tr>`;
+  }).join('');
+}
+function exportCSV(){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const rows=[['Name','Phone','Event Date','Total','Status','Notes','Order ID']];
+  [...orders].sort((a,b)=>a.customerName.localeCompare(b.customerName)).forEach(o=>{
+    rows.push([o.customerName, o.phone, new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US'),
+      `$${o.total}`, o.voided?'Voided':'Active', o.notes||'', o.id]);
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='zilicious-contacts.csv'; a.click();
+}
+function copyAllPhones(){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  if(!orders.length){ alert('No contacts yet.'); return; }
+  const seen={}, lines=[];
+  orders.forEach(o=>{ if(!seen[o.phone]){ seen[o.phone]=true; lines.push(`${o.customerName}: ${o.phone}${o.voided?' (voided)':''}`); }});
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>alert(`✓ Copied ${lines.length} contacts!`));
+}
+
+/* ── TABS ── */
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='report') renderReport();
+  if(name==='blocked') renderBlockedDates();
+  if(name==='voided') renderVoided();
+  if(name==='contacts') renderContacts();
+}
+
+/* ── SALES REPORT ── */
+function renderReport(){
+  const period=document.getElementById('reportPeriod').value;
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]').filter(o=>!o.voided);
+  const now=new Date();
+  const filtered=orders.filter(o=>{
+    const d=new Date(o.timestamp);
+    if(period==='day') return d.toDateString()===now.toDateString();
+    if(period==='week'){ const w=new Date(now); w.setDate(now.getDate()-now.getDay()); return d>=w; }
+    if(period==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(period==='year') return d.getFullYear()===now.getFullYear();
+    return true;
+  });
+  const totalRev=filtered.reduce((s,o)=>s+o.total,0);
+  const avgOrder=filtered.length?Math.round(totalRev/filtered.length):0;
+  const itemMap={};
+  filtered.forEach(o=>o.items.forEach(it=>{
+    if(!itemMap[it.name]) itemMap[it.name]={qty:0,rev:0};
+    itemMap[it.name].qty+=it.qty; itemMap[it.name].rev+=it.subtotal;
+  }));
+  const top=Object.entries(itemMap).sort((a,b)=>b[1].rev-a[1].rev);
+  document.getElementById('reportSummary').innerHTML=`
+    <div class="rs-item"><div class="rs-label">Orders</div><div class="rs-val">${filtered.length}</div></div>
+    <div class="rs-item"><div class="rs-label">Revenue</div><div class="rs-val">$${totalRev.toLocaleString()}</div></div>
+    <div class="rs-item"><div class="rs-label">Avg Order</div><div class="rs-val">$${avgOrder.toLocaleString()}</div></div>`;
+  document.getElementById('reportTable').innerHTML=!top.length
+    ? `<div class="no-orders" style="padding:40px"><p>No orders in this period.</p></div>`
+    : `<table><thead><tr><th>Item</th><th>Qty Sold</th><th>Revenue</th></tr></thead><tbody>
+       ${top.map(([n,{qty,rev}])=>`<tr><td>${n}</td><td>${qty}</td><td>$${rev.toLocaleString()}</td></tr>`).join('')}
+       </tbody></table>`;
+}
+
+/* ── BLOCKED DATES ── */
+function addBlockedDate(){
+  const date=document.getElementById('blockDateInput').value;
+  const note=document.getElementById('blockNoteInput').value.trim();
+  if(!date){ alert('Please select a date.'); return; }
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  if(blocked.find(b=>b.date===date)){ alert('That date is already blocked.'); return; }
+  blocked.push({date,note}); blocked.sort((a,b)=>a.date.localeCompare(b.date));
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked));
+  document.getElementById('blockDateInput').value=''; document.getElementById('blockNoteInput').value='';
+  renderBlockedDates();
+}
+function removeBlockedDate(date){
+  let blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  blocked=blocked.filter(b=>b.date!==date);
+  localStorage.setItem('zil_blocked',JSON.stringify(blocked)); renderBlockedDates();
+}
+function renderBlockedDates(){
+  const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
+  const list=document.getElementById('blockedList');
+  if(!blocked.length){ list.innerHTML=`<p style="color:var(--muted);font-size:.85rem;margin-top:10px">No dates blocked yet.</p>`; return; }
+  list.innerHTML=blocked.map(b=>{
+    const fmt=new Date(b.date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="blocked-row"><div><div class="bd-date">${fmt}</div>${b.note?`<div class="bd-note">${b.note}</div>`:''}</div>
+      <button class="btn-del" onclick="removeBlockedDate('${b.date}')">✕</button></div>`;
+  }).join('');
+}
+
+/* ── INVOICE ── */
+function openInvoice(idx){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const o=orders[idx]; if(!o) return;
+  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const itemRows=o.items.map((it,i)=>`
+    <tr><td>${it.name}</td>
+    <td class="qty-cell"><input type="number" value="${it.qty}" min="1" data-price="${it.price}" oninput="recalcInvoice()" id="invQty${i}"></td>
+    <td>$${it.price.toLocaleString()}</td><td id="invSub${i}">$${it.subtotal.toLocaleString()}</td></tr>`).join('');
+  document.getElementById('invoiceBody').innerHTML=`
+    <div class="inv-header">
+      <div><div class="inv-title">Invoice</div><div class="inv-id">${o.id}</div><div style="font-size:.8rem;color:#999;margin-top:4px">Issued: ${subDate}</div></div>
+      <div class="inv-brand"><img src="232784.png" class="inv-logo" onerror="this.style.display='none'"><h2>Zilicious Catering</h2><p>Luxury Catering · Premium Events</p></div>
+    </div>
+    <div class="inv-meta-grid">
+      <div><div class="im-label">Billed To</div><input class="inv-edit" value="${o.customerName}"></div>
+      <div><div class="im-label">Phone</div><input class="inv-edit" value="${o.phone}"></div>
+      <div><div class="im-label">Event Date</div><input class="inv-edit" value="${evtDate}"></div>
+      <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" value="${o.address||''}"></div>
+    </div>
+    <table class="inv-items-table" id="invTable">
+      <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end">
+      <div class="inv-totals">
+        <div class="it-row"><span>Subtotal</span><span id="invSubtotal">$${o.total.toLocaleString()}</span></div>
+        <div class="it-row"><span>Transport / Extra</span><input type="number" id="invTransport" value="0" min="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>Tax (%)</span><input type="number" id="invTaxPct" value="0" min="0" max="100" step="0.1" placeholder="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>Tax Amount</span><span id="invTaxAmt">$0</span></div>
+        <div class="it-row"><span>Discount</span><input type="number" id="invDiscount" value="0" min="0" oninput="recalcInvoice()"></div>
+        <div class="it-row"><span>TOTAL DUE</span><span id="invGrandTotal">$${o.total.toLocaleString()}</span></div>
+      </div>
+    </div>
+    <div class="inv-notes-section"><label>Dietary Concerns / Notes</label><textarea placeholder="Any dietary requirements…">${o.notes||''}</textarea></div>
+    <div class="inv-notes-section" style="margin-top:12px"><label>Terms / Message</label><textarea>50% deposit required to confirm booking. Balance due on event day. Thank you for choosing Zilicious Catering!</textarea></div>
+    <div class="inv-footer">Zilicious Catering · Luxury Catering &amp; Premium Events<br>Thank you for your business!</div>`;
+  document.getElementById('invoiceOverlay').classList.add('open');
+}
+function recalcInvoice(){
+  let subtotal=0;
+  document.querySelectorAll('#invTable tbody tr').forEach((row,i)=>{
+    const inp=row.querySelector('input[type=number]');
+    const sub=(parseInt(inp.value)||0)*(parseFloat(inp.dataset.price)||0);
+    subtotal+=sub; document.getElementById(`invSub${i}`).textContent='$'+sub.toLocaleString();
+  });
+  const transport=parseFloat(document.getElementById('invTransport').value)||0;
+  const taxPct=parseFloat(document.getElementById('invTaxPct').value)||0;
+  const taxAmt=(subtotal+transport)*taxPct/100;
+  const discount=parseFloat(document.getElementById('invDiscount').value)||0;
+  const grand=Math.max(0, subtotal+transport+taxAmt-discount);
+  document.getElementById('invSubtotal').textContent='$'+subtotal.toLocaleString();
+  document.getElementById('invTaxAmt').textContent='$'+(taxAmt).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('invGrandTotal').textContent='$'+grand.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function closeInvoice(){ document.getElementById('invoiceOverlay').classList.remove('open'); }
+function shareInvoice(){
+  if(navigator.clipboard) navigator.clipboard.writeText(location.href).then(()=>alert('URL copied! Use Print to save as PDF.'));
+  else alert('Use the Print button to save as PDF.');
+}
+
+/* ── RECEIPT ── */
+function openReceipt(idx){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const o=orders[idx]; if(!o) return;
+  const now=new Date();
+  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const printedOn=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+    +' '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+  const itemRows=o.items.map(it=>`
+    <tr>
+      <td>${it.name}</td>
+      <td style="text-align:center">${it.qty}</td>
+      <td style="text-align:right">$${it.subtotal.toLocaleString()}</td>
+    </tr>`).join('');
+
+  document.getElementById('receiptBody').innerHTML=`
+    <img src="232784.png" class="rct-logo" onerror="this.style.display='none'">
+    <div class="rct-biz">
+      <h2>Zilicious Catering</h2>
+      <p>Luxury Catering · Premium Events</p>
+    </div>
+    <hr class="rct-dash">
+    <div class="rct-meta">
+      <div><span class="lbl">Customer</span><span class="val">${o.customerName}</span></div>
+      <div><span class="lbl">Phone</span><span class="val">${o.phone}</span></div>
+      <div><span class="lbl">Event Date</span><span class="val">${evtDate}</span></div>
+      ${o.address?`<div><span class="lbl">Location</span><span class="val">${o.address}</span></div>`:''}
+    </div>
+    <hr class="rct-dash">
+    <table class="rct-items-tbl">
+      <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <hr class="rct-dash solid">
+    <div class="rct-totals-section" id="rctTotals">
+      <div class="rct-tot-row"><span>Subtotal</span><span id="rctSubtotal">$${o.total.toLocaleString()}</span></div>
+      <div class="rct-tot-row"><span>Transport / Extra</span><span>$0.00</span></div>
+      <div class="rct-tax-line">
+        <label>Tax %</label>
+        <input type="number" id="rctTaxPct" value="0" min="0" max="100" step="0.1" placeholder="0" oninput="recalcReceipt(${o.total})">
+        <span id="rctTaxAmt">$0.00</span>
+      </div>
+      <div class="rct-tot-row grand"><span>TOTAL</span><span id="rctGrand">$${o.total.toLocaleString()}</span></div>
+    </div>
+    ${o.notes?`<hr class="rct-dash"><p style="font-size:.76rem;color:#777;text-align:center">${o.notes}</p>`:''}
+    <div class="rct-footer">
+      <div class="ty">Thank You!</div>
+      <p>We appreciate your business.<br>Zilicious Catering · Luxury Catering &amp; Premium Events</p>
+    </div>
+    <div class="rct-oid">Ref: ${o.id} · Printed: ${printedOn}</div>`;
+
+  document.getElementById('receiptOverlay').classList.add('open');
+}
+
+function recalcReceipt(baseSubtotal){
+  const taxPct=parseFloat(document.getElementById('rctTaxPct').value)||0;
+  const taxAmt=baseSubtotal*taxPct/100;
+  const grand=baseSubtotal+taxAmt;
+  document.getElementById('rctTaxAmt').textContent='$'+(taxAmt).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('rctGrand').textContent='$'+grand.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function closeReceipt(){ document.getElementById('receiptOverlay').classList.remove('open'); }
+function shareReceipt(){
+  if(navigator.clipboard) navigator.clipboard.writeText(location.href).then(()=>alert('URL copied! Use Print to save as PDF.'));
+  else alert('Use the Print button to save as PDF.');
+}
+
+/* ── CONTRACT ── */
+function openContract(){ document.getElementById('contractOverlay').classList.add('open'); }
+function closeContract(){ document.getElementById('contractOverlay').classList.remove('open'); }
+</script>
+</body>
+</html>
