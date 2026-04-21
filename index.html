@@ -258,10 +258,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .inv-items-table tr:last-child td{border-bottom:none}
 .inv-items-table .qty-cell input{width:50px;text-align:center;border:1.5px solid #ddd;border-radius:8px;padding:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none}
 .inv-items-table .qty-cell input:focus{border-color:#e8006f}
-.inv-totals{margin-left:auto;width:260px;font-size:.9rem}
-.inv-totals .it-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee}
+.inv-totals{margin-left:auto;width:min(100%,340px);font-size:.9rem}
+.inv-totals .it-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #eee}
 .inv-totals .it-row:last-child{border-bottom:none;font-weight:700;font-size:1rem;color:#e8006f}
-.inv-totals .it-row input{width:90px;text-align:right;border:none;border-bottom:1.5px dashed #ddd;font-family:'DM Sans',sans-serif;font-size:.9rem;color:#333;outline:none;background:transparent}
+.inv-totals .it-row span:first-child{flex:1;min-width:0}
+.inv-totals .it-row input{flex:0 0 90px;width:90px;text-align:right;border:none;border-bottom:1.5px dashed #ddd;font-family:'DM Sans',sans-serif;font-size:.9rem;color:#333;outline:none;background:transparent}
 .inv-totals .it-row input:focus{border-bottom-color:#e8006f}
 .inv-notes-section{margin-top:20px;border-top:1px solid #eee;padding-top:16px}
 .inv-notes-section label{font-size:.76rem;text-transform:uppercase;letter-spacing:.1em;color:#999;display:block;margin-bottom:6px}
