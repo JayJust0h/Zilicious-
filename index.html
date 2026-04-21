@@ -41,6 +41,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .brand-name{font-family:'Playfair Display',serif;font-size:2.6rem;font-style:italic;font-weight:700;letter-spacing:.02em;color:var(--pk);position:relative;z-index:1;line-height:1.1;text-shadow:0 0 24px rgba(232,0,111,.45)}
 .tagline{color:var(--muted);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin-top:4px;position:relative;z-index:1}
 .price-note{display:inline-block;margin-top:12px;padding:5px 16px;border:1px solid rgba(232,0,111,.5);border-radius:100px;color:var(--pk3);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;position:relative;z-index:1}
+.header-menu{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1}
+.menu-btn{padding:8px 16px;border:1.5px solid var(--pk);background:transparent;color:var(--pk3);border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.menu-btn:hover{background:var(--pk);color:#fff}
 .qr-in-header{margin-top:18px;position:relative;z-index:1}
 .qr-in-header img{width:120px;height:120px;border-radius:10px;display:block;margin:0 auto;border:2px solid var(--pk)}
 .qr-in-header p{color:var(--muted);font-size:.72rem;margin-top:5px;letter-spacing:.08em;text-transform:uppercase}
@@ -384,6 +387,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="brand-name">Zilicious Catering</div>
     <p class="tagline">Luxury Catering · Premium Events</p>
     <span class="price-note">All prices per large tray · USD</span>
+    <div class="header-menu">
+      <button class="menu-btn" onclick="document.getElementById('aboutSection').scrollIntoView({behavior:'smooth'})">About Us</button>
+      <button class="menu-btn" onclick="openContract()">Service Contract</button>
+    </div>
     <div class="qr-in-header">
       <img src="qr-code.png" alt="Scan to order">
       <p>Scan to open &amp; share menu</p>
@@ -493,18 +500,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <p style="margin-top:10px;font-size:.8rem;line-height:1.6">Making every event unforgettable — from intimate gatherings to grand celebrations.</p>
         <button onclick="openContract()" style="margin-top:14px;padding:9px 20px;background:var(--pk);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#ff3399'" onmouseout="this.style.background='#e8006f'">📄 View Service Contract</button>
       </div>
-      <div class="footer-section">
+      <div class="footer-section" id="aboutSection">
         <h4>About Us</h4>
-        <p>Zilicious Catering is a premier catering company dedicated to delivering exceptional culinary experiences. We specialize in Kenyan and fusion cuisine crafted from the finest ingredients, served with elegance and warmth.</p>
-        <p style="margin-top:8px">Whether it's a wedding, corporate event, birthday, or family gathering — we bring the flavors, you bring the guests.</p>
+        <p>Zilicious Catering is a premier culinary brand led by Chef Zilander, whose 20 years of experience span internationally acclaimed kitchens and luxury hospitality. Trained in world-class establishments—including the Four Seasons Hotel Dubai, Mövenpick Hotel Aqaba, Jordan, and Rite Bite Dubai—she brings refined technique and global inspiration to every dish, artfully blending Kenyan, American, and Indian cuisines.</p>
+        <p style="margin-top:8px">Since its founding in 2015, Zilicious Catering has curated exceptional dining experiences for weddings, graduation celebrations, birthday parties, and exclusive events across the United States—from Dallas to Seattle—and is now proudly based in Southern California.</p>
       </div>
       <div class="footer-section">
         <h4>Contact Us</h4>
-        <p style="color:var(--muted);font-size:.8rem;margin-bottom:10px">Send us your contact details and we'll update this section for you.</p>
-        <div class="contact-row"><span>📞</span><span id="footerPhone">—</span></div>
-        <div class="contact-row"><span>📧</span><span id="footerEmail">—</span></div>
-        <div class="contact-row"><span>📍</span><span id="footerAddress">—</span></div>
-        <div class="contact-row"><span>🌐</span><a href="https://zilicious-im2e.vercel.app" id="footerWeb" target="_blank">zilicious-im2e.vercel.app</a></div>
+        <div class="contact-row"><span>📞</span><span>951-807-1929</span></div>
+        <div class="contact-row"><span>📧</span><span>zilcreations555@gmail.com</span></div>
       </div>
     </div>
     <div class="footer-bottom">
@@ -518,6 +522,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="contract-wrap">
       <div class="contract-actions">
         <button class="ct-btn" onclick="closeContract()">✕ Close</button>
+        <button class="ct-btn primary" onclick="signContract()">✓ Sign &amp; Accept</button>
         <button class="ct-btn" onclick="window.print()">🖨 Print Contract</button>
       </div>
       <div class="contract-body">
@@ -542,48 +547,50 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
 
         <div class="ct-section">
-          <h4>Services</h4>
-          <p>Zilicious Catering agrees to provide catering services as outlined in the confirmed order/quote. The menu, quantities, and delivery details shall be as agreed upon at time of booking confirmation.</p>
+          <h4>Contract Deposit</h4>
+          <p>As part of this Contract, the Caterer requires a <strong>Deposit of 75%</strong> at the time of signing this Contract within 24 hours.</p>
         </div>
 
         <div class="ct-section">
-          <h4>Payment Terms</h4>
+          <h4>Terms of Payment</h4>
           <ul>
-            <li>A <strong>50% deposit</strong> is required to confirm and secure your booking date.</li>
-            <li>The remaining <strong>50% balance</strong> is due on or before the event day, prior to service.</li>
-            <li>Payments may be made via [Payment Method — to be completed].</li>
-            <li>All prices are in USD and are final upon booking confirmation.</li>
+            <li>The Client will be responsible to pay the Caterer for the balance of the Total Amount prior to the date of delivery or at the latest one day before the event.</li>
           </ul>
         </div>
 
         <div class="ct-section">
-          <h4>Cancellation Policy</h4>
+          <h4>Methods of Payment</h4>
           <ul>
-            <li>Cancellations made <strong>14+ days</strong> before the event: deposit is refundable minus a 10% processing fee.</li>
-            <li>Cancellations made <strong>7–13 days</strong> before the event: 50% of deposit is forfeited.</li>
-            <li>Cancellations made <strong>less than 7 days</strong> before the event: deposit is non-refundable.</li>
-            <li>Zilicious Catering reserves the right to cancel in the event of unforeseen circumstances, with a full refund of all payments made.</li>
+            <li>☐ Zelle</li>
+            <li>☐ Cash</li>
           </ul>
         </div>
 
         <div class="ct-section">
-          <h4>Transport &amp; Delivery</h4>
-          <p>Delivery is available within a 50-mile radius at $1.00. Beyond 50 miles, an additional fee of $1.50 per mile applies. Client is responsible for providing accurate delivery address and access information.</p>
+          <h4>Event Cancellation</h4>
+          <ul>
+            <li>Cancellation made by the Client within 2 weeks prior to the event: the Deposit made shall be refundable.</li>
+            <li>Cancellation made by the Client within 1 week prior to the event: the Deposit made shall be non-refundable.</li>
+          </ul>
         </div>
 
         <div class="ct-section">
-          <h4>Dietary &amp; Allergen Responsibility</h4>
-          <p>The Client is responsible for informing Zilicious Catering of any dietary restrictions, allergies, or special requirements at time of booking. Zilicious Catering will make every reasonable effort to accommodate such requirements but cannot guarantee a completely allergen-free environment.</p>
-        </div>
-
-        <div class="ct-section">
-          <h4>Equipment &amp; Chafing Dishes</h4>
-          <p>Any chafing dishes, serving equipment, or rentals provided by Zilicious Catering remain the property of the Caterer. The Client is responsible for any damage or loss of equipment during the event.</p>
-        </div>
-
-        <div class="ct-section">
-          <h4>Liability</h4>
-          <p>Zilicious Catering's liability is limited to the total amount paid by the Client. The Caterer is not responsible for damages arising from circumstances beyond our reasonable control.</p>
+          <h4>Miscellaneous</h4>
+          <p><strong>The Caterer shall provide:</strong></p>
+          <ul>
+            <li>Serving spoons</li>
+            <li>Salt</li>
+            <li>Sugar</li>
+          </ul>
+          <p style="margin-top:8px"><strong>The Client shall provide:</strong></p>
+          <ul>
+            <li>Plates</li>
+            <li>Cutlery</li>
+            <li>Cups</li>
+            <li>Napkins</li>
+            <li>To go containers</li>
+            <li>Aluminum trays for leftovers</li>
+          </ul>
         </div>
 
         <div class="ct-section">
@@ -592,14 +599,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
           <div class="ct-sig-box">
             <p>Client Signature — Please print your full name below</p>
-            <input class="ct-sig-input" placeholder="Print full name here" type="text">
+            <input class="ct-sig-input" id="contractSignature" placeholder="Print full name here" type="text">
             <div style="display:flex;justify-content:space-between;margin-top:16px;gap:20px;flex-wrap:wrap">
               <div style="flex:1;min-width:160px">
                 <div class="ct-field-label" style="font-size:.72rem;color:#aaa;text-transform:uppercase;letter-spacing:.08em">Date Signed</div>
-                <input type="date" class="ct-date-field" style="width:100%">
+                <input type="date" class="ct-date-field" id="contractDateSigned" style="width:100%">
               </div>
               <div style="flex:1;min-width:160px">
-                <div class="ct-initials-row"><input class="ct-initials-input" placeholder="Initials" maxlength="4"><span class="ct-initials-label">Client initials confirming all pages read</span></div>
+                <div class="ct-initials-row"><input class="ct-initials-input" id="contractInitials" placeholder="Initials" maxlength="4"><span class="ct-initials-label">Client initials confirming all pages read</span></div>
               </div>
             </div>
           </div>
@@ -616,6 +623,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
   </div>
+  <div class="cart-bar" id="cartBar" onclick="openModal()">
     <span>🛒</span>
     <span id="cartLabel">0 items</span>
     <span class="cart-total" id="cartTotal">$0</span>
@@ -767,6 +775,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <script>
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzJgr-TKnm1gO-_XbOKtZ3Chgq8YO3Bp0eXeD28Kwc-LNhb4Onl9VbD_AWjiGgLJd3M/exec';
 const ADMIN_PASSWORD = 'Zilicious2027';
+let contractSigned = false;
+let continueAfterContract = false;
 
 /* Apply saved theme immediately before paint — default is dark */
 (function(){
@@ -892,6 +902,12 @@ function showSummary(){
 }
 function showForm(){
   if(!Object.keys(cart).length) return;
+  if(!contractSigned){
+    continueAfterContract = true;
+    openContract();
+    alert('Please sign the service contract before confirming your order.');
+    return;
+  }
   document.getElementById('modalTitle').textContent='Contact Details';
   document.getElementById('screenSummary').style.display='none';
   document.getElementById('screenForm').style.display='block';
@@ -938,6 +954,11 @@ async function submitOrder(){
   document.getElementById('modalTitle').textContent='All Done!';
   document.getElementById('screenForm').style.display='none';
   document.getElementById('screenSuccess').style.display='block';
+  contractSigned = false;
+  continueAfterContract = false;
+  document.getElementById('contractSignature').value='';
+  document.getElementById('contractDateSigned').value='';
+  document.getElementById('contractInitials').value='';
   Object.keys(cart).forEach(k=>delete cart[k]);
   document.querySelectorAll('.qty-input').forEach(el=>el.value=0);
   document.querySelectorAll('.qty-control').forEach(el=>el.classList.remove('active'));
@@ -1335,6 +1356,21 @@ function shareReceipt(){
 /* ── CONTRACT ── */
 function openContract(){ document.getElementById('contractOverlay').classList.add('open'); }
 function closeContract(){ document.getElementById('contractOverlay').classList.remove('open'); }
+function signContract(){
+  const sig=document.getElementById('contractSignature').value.trim();
+  const signedDate=document.getElementById('contractDateSigned').value;
+  const initials=document.getElementById('contractInitials').value.trim();
+  if(!sig||!signedDate||!initials){
+    alert('Please enter signature, date signed, and initials to accept the contract.');
+    return;
+  }
+  contractSigned = true;
+  closeContract();
+  if(continueAfterContract){
+    continueAfterContract = false;
+    showForm();
+  }
+}
 </script>
 </body>
 </html>
