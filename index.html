@@ -1018,7 +1018,7 @@ function toISODateValue(v){
   if(!raw) return '';
   if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
   const d=new Date(raw);
-  if(isNaN(d)) return '';
+  if(isNaN(d.getTime())) return '';
   const y=d.getFullYear();
   const m=String(d.getMonth()+1).padStart(2,'0');
   const day=String(d.getDate()).padStart(2,'0');
@@ -1447,7 +1447,8 @@ function isNonTaxable(name){ return NON_TAXABLE_KEYWORDS.some(k=>name.toLowerCas
 function openInvoice(idx){
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const o=orders[idx]; if(!o) return;
-  const eventDateValue=toISODateValue(o.eventDate);
+  const existingOverlayDate=document.getElementById('invoiceOverlay').dataset.eventDate;
+  const eventDateValue=toISODateValue(o.eventDate) || toISODateValue(existingOverlayDate);
   document.getElementById('invoiceOverlay').dataset.idx=idx;
   document.getElementById('invoiceOverlay').dataset.orderId=o.id;
   document.getElementById('invoiceOverlay').dataset.eventDate=eventDateValue;
@@ -1612,13 +1613,14 @@ async function saveInvoiceChanges(){
 
   const dom=readInvoiceDom();
   const invEventDateEl=document.getElementById('invEventDate');
+  const rawEventDate = invEventDateEl ? invEventDateEl.value : (document.getElementById('invoiceOverlay').dataset.eventDate || '');
   const snap={
     invoiceId:    'INV-'+orderId,
     orderId,
     exportedAt:   new Date().toISOString(),
     customerName: dom.customerName,
     phone:        ensureSheetSafePhone(dom.phone),
-    eventDate:    invEventDateEl ? invEventDateEl.value : (document.getElementById('invoiceOverlay').dataset.eventDate || ''),
+    eventDate:    toISODateValue(rawEventDate),
     address:      dom.address,
     notes:        dom.notes,
     items:        dom.items,
