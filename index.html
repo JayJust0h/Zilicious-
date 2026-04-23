@@ -1007,6 +1007,23 @@ function fmtPhone(i){
   else if(v.length>0) v=`(${v}`;
   i.value=v;
 }
+function ensureSheetSafePhone(phone){
+  const raw=String(phone||'').trim();
+  if(!raw) return '';
+  const noApostrophe=raw.replace(/^'+/,'');
+  return noApostrophe.startsWith('+1') ? `'${noApostrophe}` : noApostrophe;
+}
+function toISODateValue(v){
+  const raw=String(v||'').trim();
+  if(!raw) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const d=new Date(raw);
+  if(isNaN(d.getTime())) return '';
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function validateDate(){
   const val=document.getElementById('fDate').value;
   const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
@@ -1037,7 +1054,7 @@ async function submitOrder(){
     id:'ORD-'+Date.now(),
     timestamp:new Date().toISOString(),
     customerName:name,
-    phone: '+1 ' + phoneFormatted,   // "+1 (951) 807-1929" — readable but consistently formatted
+    phone: ensureSheetSafePhone('+1 ' + phoneFormatted),   // "'+1 (951) 807-1929" — sheet-safe
     eventDate:date,
     address, notes, items, total
   };
@@ -1155,20 +1172,15 @@ function normaliseOrder(o){
     const d = new Date(o.timestamp);
     o.timestamp = isNaN(d) ? new Date().toISOString() : d.toISOString();
   }
-  // Fix eventDate: sheet may store it as "Monday, May 10, 2026" → convert to "2026-05-10"
-  if(o.eventDate && o.eventDate.includes(',')){
-    const d = new Date(o.eventDate);
-    if(!isNaN(d)){
-      const y = d.getFullYear();
-      const m = String(d.getMonth()+1).padStart(2,'0');
-      const day = String(d.getDate()).padStart(2,'0');
-      o.eventDate = `${y}-${m}-${day}`;
-    }
-  }
+  // Ensure eventDate is consistently YYYY-MM-DD when parseable
+  const parsedEventDate = toISODateValue(o.eventDate);
+  if(parsedEventDate) o.eventDate = parsedEventDate;
   // Ensure items array exists
   if(!Array.isArray(o.items)) o.items=[];
   // Ensure total is a number
   o.total = parseFloat(o.total)||0;
+  // Keep phone sheet-safe so +1 is not parsed/formula-processed by spreadsheets
+  o.phone = ensureSheetSafePhone(o.phone);
   return o;
 }
 
@@ -1435,10 +1447,10 @@ function isNonTaxable(name){ return NON_TAXABLE_KEYWORDS.some(k=>name.toLowerCas
 function openInvoice(idx){
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const o=orders[idx]; if(!o) return;
+  const eventDateValue=toISODateValue(o.eventDate);
   document.getElementById('invoiceOverlay').dataset.idx=idx;
   document.getElementById('invoiceOverlay').dataset.orderId=o.id;
-  document.getElementById('invoiceOverlay').dataset.eventDate=o.eventDate;
-  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('invoiceOverlay').dataset.eventDate=eventDateValue;
   const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
   // Try to restore from Sheet first (cross-device), fall back to local invoiceState
@@ -1453,16 +1465,16 @@ function openInvoice(idx){
     const savedAt        = s.exportedAt||s.savedAt ? ' · Last saved: '+new Date(s.exportedAt||s.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
     // Use sheetInv items if available (they may have been edited on another device)
     const itemsToUse = sheetInv && sheetInv.items && sheetInv.items.length ? sheetInv.items : o.items;
-    _populateInvoiceBody(o, itemsToUse, evtDate, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt);
+    _populateInvoiceBody(o, itemsToUse, eventDateValue, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt);
   }).catch(()=>{
     // Offline fallback — use local state
     const s = o.invoiceState || {};
-    _populateInvoiceBody(o, o.items, evtDate, subDate, s.transport||0, s.extra||0, s.taxPct||0, s.discount||0, s.terms||'75% deposit required at signing within 24hrs. Balance due prior to delivery or 1 day before event. Payment: Zelle or Cash. Chafers & transport charges are non-taxable. Thank you for choosing Zilicious Catering!', '');
+    _populateInvoiceBody(o, o.items, eventDateValue, subDate, s.transport||0, s.extra||0, s.taxPct||0, s.discount||0, s.terms||'75% deposit required at signing within 24hrs. Balance due prior to delivery or 1 day before event. Payment: Zelle or Cash. Chafers & transport charges are non-taxable. Thank you for choosing Zilicious Catering!', '');
   });
   document.getElementById('invoiceOverlay').classList.add('open');
 }
 
-function _populateInvoiceBody(o, items, evtDate, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt){
+function _populateInvoiceBody(o, items, eventDateValue, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt){
   const itemRows=items.map((it,i)=>`
     <tr id="invRow${i}">
       <td><input class="inv-edit" style="width:100%;min-width:120px" value="${it.name}" oninput="recalcInvoice()"></td>
@@ -1480,7 +1492,7 @@ function _populateInvoiceBody(o, items, evtDate, subDate, savedTransport, savedE
     <div class="inv-meta-grid">
       <div><div class="im-label">Billed To</div><input class="inv-edit" id="invName" value="${o.customerName}"></div>
       <div><div class="im-label">Phone</div><input class="inv-edit" id="invPhone" value="${o.phone}"></div>
-      <div><div class="im-label">Event Date</div><input class="inv-edit" value="${evtDate}"></div>
+      <div><div class="im-label">Event Date</div><input type="date" class="inv-edit" id="invEventDate" value="${eventDateValue||''}"></div>
       <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" id="invAddr" value="${o.address||''}"></div>
     </div>
     <table class="inv-items-table" id="invTable">
@@ -1599,13 +1611,15 @@ async function saveInvoiceChanges(){
   if(!orderId){ alert('Cannot save — no order linked.'); return; }
 
   const dom=readInvoiceDom();
+  const invEventDateEl=document.getElementById('invEventDate');
+  const rawEventDate = invEventDateEl ? invEventDateEl.value : (document.getElementById('invoiceOverlay').dataset.eventDate || '');
   const snap={
     invoiceId:    'INV-'+orderId,
     orderId,
     exportedAt:   new Date().toISOString(),
     customerName: dom.customerName,
-    phone:        dom.phone,
-    eventDate:    document.getElementById('invoiceOverlay').dataset.eventDate||'',
+    phone:        ensureSheetSafePhone(dom.phone),
+    eventDate:    toISODateValue(rawEventDate),
     address:      dom.address,
     notes:        dom.notes,
     items:        dom.items,
@@ -1635,7 +1649,8 @@ async function saveInvoiceChanges(){
     orders[oi].items=dom.items;
     orders[oi].total=dom.grandTotal;
     orders[oi].customerName=dom.customerName;
-    orders[oi].phone=dom.phone;
+    orders[oi].phone=snap.phone;
+    orders[oi].eventDate=snap.eventDate;
     orders[oi].address=dom.address;
     orders[oi].notes=dom.notes;
     // Store invoiceState for the openInvoice restore — charges persist
