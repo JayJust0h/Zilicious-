@@ -245,15 +245,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .inv-btn.primary{background:#e8006f;color:white;border-color:#e8006f}
 .inv-btn.primary:hover{background:#ff3399}
 .invoice-body{padding:32px 36px;position:relative}
-.invoice-body::before{
-  content:'';
-  position:fixed;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  width:500px;height:500px;
-  background:url('watermark.png') center/contain no-repeat;
-  opacity:0.15;pointer-events:none;z-index:0;
-  -webkit-print-color-adjust:exact;print-color-adjust:exact;
-}
 .invoice-body>*{position:relative;z-index:1}
 .inv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
 .inv-logo{width:80px;height:80px;object-fit:contain;border-radius:50%}
