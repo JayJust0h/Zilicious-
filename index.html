@@ -1013,6 +1013,17 @@ function ensureSheetSafePhone(phone){
   const noApostrophe=raw.replace(/^'+/,'');
   return noApostrophe.startsWith('+1') ? `'${noApostrophe}` : noApostrophe;
 }
+function toISODateValue(v){
+  const raw=String(v||'').trim();
+  if(!raw) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const d=new Date(raw);
+  if(isNaN(d)) return '';
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
 function validateDate(){
   const val=document.getElementById('fDate').value;
   const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
@@ -1161,16 +1172,9 @@ function normaliseOrder(o){
     const d = new Date(o.timestamp);
     o.timestamp = isNaN(d) ? new Date().toISOString() : d.toISOString();
   }
-  // Fix eventDate: sheet may store it as "Monday, May 10, 2026" → convert to "2026-05-10"
-  if(o.eventDate && o.eventDate.includes(',')){
-    const d = new Date(o.eventDate);
-    if(!isNaN(d)){
-      const y = d.getFullYear();
-      const m = String(d.getMonth()+1).padStart(2,'0');
-      const day = String(d.getDate()).padStart(2,'0');
-      o.eventDate = `${y}-${m}-${day}`;
-    }
-  }
+  // Ensure eventDate is consistently YYYY-MM-DD when parseable
+  const parsedEventDate = toISODateValue(o.eventDate);
+  if(parsedEventDate) o.eventDate = parsedEventDate;
   // Ensure items array exists
   if(!Array.isArray(o.items)) o.items=[];
   // Ensure total is a number
@@ -1443,9 +1447,10 @@ function isNonTaxable(name){ return NON_TAXABLE_KEYWORDS.some(k=>name.toLowerCas
 function openInvoice(idx){
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const o=orders[idx]; if(!o) return;
+  const eventDateValue=toISODateValue(o.eventDate);
   document.getElementById('invoiceOverlay').dataset.idx=idx;
   document.getElementById('invoiceOverlay').dataset.orderId=o.id;
-  document.getElementById('invoiceOverlay').dataset.eventDate=o.eventDate;
+  document.getElementById('invoiceOverlay').dataset.eventDate=eventDateValue;
   const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
   // Try to restore from Sheet first (cross-device), fall back to local invoiceState
@@ -1460,11 +1465,11 @@ function openInvoice(idx){
     const savedAt        = s.exportedAt||s.savedAt ? ' · Last saved: '+new Date(s.exportedAt||s.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
     // Use sheetInv items if available (they may have been edited on another device)
     const itemsToUse = sheetInv && sheetInv.items && sheetInv.items.length ? sheetInv.items : o.items;
-    _populateInvoiceBody(o, itemsToUse, o.eventDate, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt);
+    _populateInvoiceBody(o, itemsToUse, eventDateValue, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt);
   }).catch(()=>{
     // Offline fallback — use local state
     const s = o.invoiceState || {};
-    _populateInvoiceBody(o, o.items, o.eventDate, subDate, s.transport||0, s.extra||0, s.taxPct||0, s.discount||0, s.terms||'75% deposit required at signing within 24hrs. Balance due prior to delivery or 1 day before event. Payment: Zelle or Cash. Chafers & transport charges are non-taxable. Thank you for choosing Zilicious Catering!', '');
+    _populateInvoiceBody(o, o.items, eventDateValue, subDate, s.transport||0, s.extra||0, s.taxPct||0, s.discount||0, s.terms||'75% deposit required at signing within 24hrs. Balance due prior to delivery or 1 day before event. Payment: Zelle or Cash. Chafers & transport charges are non-taxable. Thank you for choosing Zilicious Catering!', '');
   });
   document.getElementById('invoiceOverlay').classList.add('open');
 }
@@ -1606,13 +1611,14 @@ async function saveInvoiceChanges(){
   if(!orderId){ alert('Cannot save — no order linked.'); return; }
 
   const dom=readInvoiceDom();
+  const invEventDateEl=document.getElementById('invEventDate');
   const snap={
     invoiceId:    'INV-'+orderId,
     orderId,
     exportedAt:   new Date().toISOString(),
     customerName: dom.customerName,
     phone:        ensureSheetSafePhone(dom.phone),
-    eventDate:    document.getElementById('invEventDate')?.value || document.getElementById('invoiceOverlay').dataset.eventDate || '',
+    eventDate:    invEventDateEl ? invEventDateEl.value : (document.getElementById('invoiceOverlay').dataset.eventDate || ''),
     address:      dom.address,
     notes:        dom.notes,
     items:        dom.items,
