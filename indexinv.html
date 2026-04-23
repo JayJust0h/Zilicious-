@@ -703,6 +703,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div><h2>📋 Orders Dashboard</h2><p>Zilicious Catering · All submitted orders</p></div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button id="syncBtn" class="refresh-btn" onclick="syncOrders()">↻ Sync All Orders</button>
+      <button id="syncInvBtn" class="refresh-btn" onclick="syncInvoicesFromSheet()" style="background:var(--blk3);border:1px solid var(--pk)" title="Pull latest invoice data from Google Sheet">🔄 Sync Invoices</button>
       <button class="refresh-btn" onclick="exportAllInvoicesToSheet()" style="background:#111;border:1px solid var(--pk)" title="Push all saved invoices to Google Sheet">☁️ Export Invoices</button>
       <button class="refresh-btn" onclick="loadOrders()" style="background:var(--blk3);border:1px solid var(--pk)">↺ Refresh</button>
       <button class="admin-logout" onclick="adminLogout()">Sign Out</button>
@@ -1137,6 +1138,44 @@ async function fetchSheetOrders(){
   }catch(e){ console.warn('fetchSheetOrders failed:', e.message); return []; }
 }
 
+async function fetchFromSheet(action){
+  if(!SHEET_URL) return {};
+  try{
+    const res=await fetch(`${SHEET_URL}?action=${action}&t=${Date.now()}`);
+    if(!res.ok) return {};
+    const text=await res.text();
+    const clean=text.replace(/^[^{[]*/,'').replace(/[^}\]]*$/,'');
+    return JSON.parse(clean);
+  }catch(e){ console.warn('fetchFromSheet failed:',action,e); return {}; }
+}
+
+async function syncInvoicesFromSheet(){
+  const btn=document.getElementById('syncInvBtn');
+  if(btn){ btn.textContent='⟳ Syncing…'; btn.disabled=true; }
+  const data=await fetchFromSheet('getInvoices');
+  const sheetInvoices=data.invoices||[];
+  if(sheetInvoices.length){
+    const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+    let updated=0;
+    orders.forEach(o=>{
+      const sheetInv=sheetInvoices.find(i=>i.orderId===o.id);
+      if(sheetInv){
+        // Only overwrite local invoiceState if sheet version is newer or local has none
+        const localTs=o.invoiceState&&(o.invoiceState.savedAt||o.invoiceState.exportedAt);
+        const sheetTs=sheetInv.exportedAt||sheetInv.savedAt;
+        if(!localTs||(sheetTs&&new Date(sheetTs)>=new Date(localTs))){
+          o.invoiceState=sheetInv;
+          updated++;
+        }
+      }
+    });
+    localStorage.setItem('zil_orders',JSON.stringify(orders));
+    if(btn){ btn.textContent=`✓ ${updated} invoice${updated!==1?'s':''} synced`; setTimeout(()=>{ btn.textContent='🔄 Sync Invoices'; btn.disabled=false; },3000); }
+  } else {
+    if(btn){ btn.textContent='⚠ No invoices on sheet'; setTimeout(()=>{ btn.textContent='🔄 Sync Invoices'; btn.disabled=false; },3000); }
+  }
+}
+
 /* Normalise an order coming back from the Sheet so timestamps
    and eventDate are always in a consistent parseable format */
 function normaliseOrder(o){
@@ -1189,7 +1228,7 @@ async function loadOrders(){
   const syncBtn = document.getElementById('syncBtn');
   if(syncBtn){ syncBtn.textContent='⟳ Syncing…'; syncBtn.disabled=true; }
 
-  // 3. Fetch from Sheet and merge
+  // 3. Fetch orders from Sheet and merge
   const remote = await fetchSheetOrders();
   if(remote.length){
     const merged = mergeOrders(local, remote);
@@ -1199,6 +1238,9 @@ async function loadOrders(){
   } else {
     if(syncBtn){ syncBtn.textContent='⚠ Sheet unreachable — showing local'; setTimeout(()=>{ syncBtn.textContent='↻ Sync All Orders'; syncBtn.disabled=false; },3000); }
   }
+
+  // 4. Also sync invoice states from Sheet in the background
+  syncInvoicesFromSheet();
 }
 
 async function syncOrders(){
@@ -1422,23 +1464,43 @@ function renderBlockedDates(){
 const NON_TAXABLE_KEYWORDS = ['chafer','chafing','transport','extra charge','delivery'];
 function isNonTaxable(name){ return NON_TAXABLE_KEYWORDS.some(k=>name.toLowerCase().includes(k)); }
 
-function openInvoice(idx){
+async function openInvoice(idx){
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const o=orders[idx]; if(!o) return;
   document.getElementById('invoiceOverlay').dataset.idx=idx;
   const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const subDate=new Date(o.timestamp).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
-  // Restore previously saved invoice state (charges, terms, etc.)
-  const s = o.invoiceState || {};
+  // Show overlay immediately with local data while sheet fetch happens in background
+  const localS = o.invoiceState || {};
+  _populateInvoiceBody(o, o.items, evtDate, subDate, localS);
+  document.getElementById('invoiceOverlay').classList.add('open');
+
+  // Fetch latest invoice from Sheet (cross-device sync), then refresh if newer
+  fetchFromSheet('getInvoices').then(data=>{
+    const sheetInv=(data.invoices||[]).find(i=>i.orderId===o.id);
+    if(sheetInv){
+      // Only repopulate if the sheet version is newer than what we showed
+      const localTs=localS.savedAt||localS.exportedAt;
+      const sheetTs=sheetInv.exportedAt||sheetInv.savedAt;
+      if(!localTs||(sheetTs&&new Date(sheetTs)>new Date(localTs))){
+        const itemsToUse = sheetInv.items&&sheetInv.items.length ? sheetInv.items : o.items;
+        _populateInvoiceBody(o, itemsToUse, evtDate, subDate, sheetInv);
+      }
+    }
+  }).catch(()=>{ /* offline — local state already shown */ });
+}
+
+function _populateInvoiceBody(o, items, evtDate, subDate, s){
   const savedTransport = s.transport !== undefined ? s.transport : 0;
   const savedExtra     = s.extra     !== undefined ? s.extra     : 0;
   const savedTaxPct    = s.taxPct    !== undefined ? s.taxPct    : 0;
   const savedDiscount  = s.discount  !== undefined ? s.discount  : 0;
   const savedTerms     = s.terms || '75% deposit required at signing within 24hrs. Balance due prior to delivery or 1 day before event. Payment: Zelle or Cash. Chafers & transport charges are non-taxable. Thank you for choosing Zilicious Catering!';
-  const savedAt        = s.savedAt ? ' · Last saved: '+new Date(s.savedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+  const ts             = s.exportedAt||s.savedAt;
+  const savedAt        = ts ? ' · Last saved: '+new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
 
-  const itemRows=o.items.map((it,i)=>`
+  const itemRows=items.map((it,i)=>`
     <tr id="invRow${i}">
       <td><input class="inv-edit" style="width:100%;min-width:120px" value="${it.name}" oninput="recalcInvoice()"></td>
       <td class="qty-cell"><input type="number" value="${it.qty}" min="0" step="0.5" data-price="${it.price}" oninput="recalcInvoice()" id="invQty${i}" style="width:54px;text-align:center;border:1.5px solid #ddd;border-radius:8px;padding:4px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></td>
@@ -1504,7 +1566,6 @@ function openInvoice(idx){
     <div class="inv-notes-section" style="margin-top:12px"><label>Terms / Message</label><textarea id="invTerms">${savedTerms}</textarea></div>
     <div class="inv-footer">Zilicious Catering · Luxury Catering &amp; Premium Events · 951-807-1929 · zilcreations555@gmail.com<br>Thank you for your business!</div>`;
 
-  document.getElementById('invoiceOverlay').classList.add('open');
   recalcInvoice();
 }
 
