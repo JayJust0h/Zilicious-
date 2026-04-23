@@ -703,7 +703,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div><h2>📋 Orders Dashboard</h2><p>Zilicious Catering · All submitted orders</p></div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button id="syncBtn" class="refresh-btn" onclick="syncOrders()">↻ Sync All Orders</button>
-      <button class="refresh-btn" onclick="exportAllInvoicesToSheet()" style="background:#111;border:1px solid var(--pk)" title="Push all saved invoices to Google Sheet">☁️ Export Invoices</button>
+      <button id="syncInvBtn" class="refresh-btn" onclick="syncInvoicesFromSheet()" style="background:var(--blk3);border:1px solid var(--pk)" title="Pull latest invoice data from Google Sheet">🔄 Sync Invoices</button>
+      <button class="refresh-btn" onclick="exportAllInvoicesToSheet()" style="background:#111;border:1px solid var(--pk)" title="Push all saved invoices to Google Sheet — also imports any missing invoices from the sheet first">☁️ Export Invoices</button>
       <button class="refresh-btn" onclick="loadOrders()" style="background:var(--blk3);border:1px solid var(--pk)">↺ Refresh</button>
       <button class="admin-logout" onclick="adminLogout()">Sign Out</button>
     </div>
@@ -1192,6 +1193,34 @@ function mergeOrders(local, remote){
   return Object.values(map).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
 }
 
+async function syncInvoicesFromSheet(){
+  const btn=document.getElementById('syncInvBtn');
+  if(btn){ btn.textContent='⟳ Syncing…'; btn.disabled=true; }
+  const data=await fetchFromSheet('getInvoices');
+  const sheetInvoices=data.invoices||[];
+  if(sheetInvoices.length){
+    const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+    let updated=0;
+    orders.forEach(o=>{
+      const sheetInv=sheetInvoices.find(i=>i.orderId===o.id);
+      if(sheetInv){
+        // Only overwrite local invoiceState if sheet version is newer or local has none
+        const localTs=o.invoiceState&&(o.invoiceState.savedAt||o.invoiceState.exportedAt);
+        const sheetTs=sheetInv.exportedAt||sheetInv.savedAt;
+        if(!localTs||(sheetTs&&new Date(sheetTs)>=new Date(localTs))){
+          o.invoiceState=sheetInv;
+          updated++;
+        }
+      }
+    });
+    localStorage.setItem('zil_orders',JSON.stringify(orders));
+    renderOrdersAndStats(orders);
+    if(btn){ btn.textContent=`✓ ${updated} invoice${updated!==1?'s':''} synced`; setTimeout(()=>{ btn.textContent='🔄 Sync Invoices'; btn.disabled=false; },3000); }
+  } else {
+    if(btn){ btn.textContent='⚠ No invoices on sheet'; setTimeout(()=>{ btn.textContent='🔄 Sync Invoices'; btn.disabled=false; },3000); }
+  }
+}
+
 async function loadOrders(){
   // 1. Show local orders immediately — no waiting
   let local = JSON.parse(localStorage.getItem('zil_orders')||'[]').map(normaliseOrder);
@@ -1211,6 +1240,9 @@ async function loadOrders(){
   } else {
     if(syncBtn){ syncBtn.textContent='⚠ Sheet unreachable — showing local'; setTimeout(()=>{ syncBtn.textContent='↻ Sync All Orders'; syncBtn.disabled=false; },3000); }
   }
+
+  // 4. Also sync invoice states from Sheet in the background
+  syncInvoicesFromSheet();
 }
 
 async function syncOrders(){
@@ -1658,10 +1690,31 @@ async function saveAndExportInvoice(){
 
 async function exportAllInvoicesToSheet(){
   const btn=document.querySelector('[onclick*="exportAllInvoices"]');
-  if(btn){ btn.textContent='⏳ Exporting…'; btn.disabled=true; }
-  // Fetch all invoices from Sheet to see which orders already have one
-  const existing=await fetchFromSheet('getInvoices');
-  const existingIds=new Set((existing.invoices||[]).map(i=>i.orderId));
+  if(btn){ btn.textContent='⏳ Syncing…'; btn.disabled=true; }
+
+  // Step 1 — Import: pull invoices from Sheet and update local invoiceState
+  const sheetData=await fetchFromSheet('getInvoices');
+  const sheetInvoices=sheetData.invoices||[];
+  let syncedIn=0;
+  if(sheetInvoices.length){
+    const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+    orders.forEach(o=>{
+      const sheetInv=sheetInvoices.find(i=>i.orderId===o.id);
+      if(sheetInv){
+        const localTs=o.invoiceState&&(o.invoiceState.savedAt||o.invoiceState.exportedAt);
+        const sheetTs=sheetInv.exportedAt||sheetInv.savedAt;
+        if(!localTs||(sheetTs&&new Date(sheetTs)>=new Date(localTs))){
+          o.invoiceState=sheetInv;
+          syncedIn++;
+        }
+      }
+    });
+    localStorage.setItem('zil_orders',JSON.stringify(orders));
+    renderOrdersAndStats(orders);
+  }
+
+  // Step 2 — Export: push locally-saved invoices that are not yet on the Sheet
+  const existingIds=new Set(sheetInvoices.map(i=>i.orderId));
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const toExport=orders.filter(o=>o.invoiceState&&!existingIds.has(o.id));
   let count=0;
@@ -1688,8 +1741,9 @@ async function exportAllInvoicesToSheet(){
     const ok=await sendToSheet('saveInvoice', snap);
     if(ok) count++;
   }
-  if(btn){ btn.textContent=`✓ ${count} exported`; btn.disabled=false; setTimeout(()=>{ btn.textContent='☁️ Export Invoices'; },3000); }
-  alert(`✓ Exported ${count} invoice${count!==1?'s':''} to Google Sheet.`);
+
+  if(btn){ btn.textContent=`✓ ${syncedIn} in / ${count} out`; btn.disabled=false; setTimeout(()=>{ btn.textContent='☁️ Export Invoices'; },3500); }
+  alert(`✓ Invoices synced: imported ${syncedIn} from Sheet, exported ${count} new to Sheet.`);
 }
 
 function closeInvoice(){ document.getElementById('invoiceOverlay').classList.remove('open'); }
