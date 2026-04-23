@@ -1447,8 +1447,7 @@ function isNonTaxable(name){ return NON_TAXABLE_KEYWORDS.some(k=>name.toLowerCas
 function openInvoice(idx){
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const o=orders[idx]; if(!o) return;
-  const existingOverlayDate=document.getElementById('invoiceOverlay').dataset.eventDate;
-  const eventDateValue=toISODateValue(o.eventDate) || toISODateValue(existingOverlayDate);
+  const eventDateValue=toISODateValue(o.eventDate);
   document.getElementById('invoiceOverlay').dataset.idx=idx;
   document.getElementById('invoiceOverlay').dataset.orderId=o.id;
   document.getElementById('invoiceOverlay').dataset.eventDate=eventDateValue;
