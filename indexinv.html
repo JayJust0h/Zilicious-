@@ -1170,6 +1170,7 @@ async function syncInvoicesFromSheet(){
       }
     });
     localStorage.setItem('zil_orders',JSON.stringify(orders));
+    renderOrdersAndStats(orders);
     if(btn){ btn.textContent=`✓ ${updated} invoice${updated!==1?'s':''} synced`; setTimeout(()=>{ btn.textContent='🔄 Sync Invoices'; btn.disabled=false; },3000); }
   } else {
     if(btn){ btn.textContent='⚠ No invoices on sheet'; setTimeout(()=>{ btn.textContent='🔄 Sync Invoices'; btn.disabled=false; },3000); }
