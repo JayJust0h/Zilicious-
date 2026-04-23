@@ -1165,6 +1165,9 @@ async function syncInvoicesFromSheet(){
         const sheetTs=sheetInv.exportedAt||sheetInv.savedAt;
         if(!localTs||(sheetTs&&new Date(sheetTs)>=new Date(localTs))){
           o.invoiceState=sheetInv;
+          if(sheetInv.address!==undefined) o.address=sheetInv.address;
+          if(sheetInv.notes!==undefined) o.notes=sheetInv.notes;
+          if(sheetInv.eventDate) o.eventDate=sheetInv.eventDate;
           updated++;
         }
       }
@@ -1518,8 +1521,8 @@ function _populateInvoiceBody(o, items, evtDate, subDate, s){
     <div class="inv-meta-grid">
       <div><div class="im-label">Billed To</div><input class="inv-edit" id="invName" value="${o.customerName}"></div>
       <div><div class="im-label">Phone</div><input class="inv-edit" id="invPhone" value="${o.phone}"></div>
-      <div><div class="im-label">Event Date</div><input class="inv-edit" value="${evtDate}"></div>
-      <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" id="invAddr" value="${o.address||''}"></div>
+      <div><div class="im-label">Event Date</div><input class="inv-edit" id="invDate" value="${(()=>{if(s.eventDate){const _d=new Date(s.eventDate.includes(',')?s.eventDate:s.eventDate+'T00:00:00');if(!isNaN(_d))return _d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});}return evtDate;})()}"></div>
+      <div><div class="im-label">Delivery / Pickup</div><input class="inv-edit" id="invAddr" value="${s.address!==undefined?s.address:(o.address||'')}"></div>
     </div>
     <table class="inv-items-table" id="invTable">
       <thead><tr><th>Item</th><th>Qty</th><th>Unit Price</th><th style="text-align:right">Subtotal</th><th class="inv-remove-btn"></th></tr></thead>
@@ -1563,7 +1566,7 @@ function _populateInvoiceBody(o, items, evtDate, subDate, s){
         </div>
       </div>
     </div>
-    <div class="inv-notes-section"><label>Dietary Concerns / Notes</label><textarea id="invNotes" placeholder="Any dietary requirements…">${o.notes||''}</textarea></div>
+    <div class="inv-notes-section"><label>Dietary Concerns / Notes</label><textarea id="invNotes" placeholder="Any dietary requirements…">${s.notes!==undefined?s.notes:(o.notes||'')}</textarea></div>
     <div class="inv-notes-section" style="margin-top:12px"><label>Terms / Message</label><textarea id="invTerms">${savedTerms}</textarea></div>
     <div class="inv-footer">Zilicious Catering · Luxury Catering &amp; Premium Events · 951-807-1929 · zilcreations555@gmail.com<br>Thank you for your business!</div>`;
 
@@ -1647,6 +1650,10 @@ function saveInvoiceChanges(){
   if(document.getElementById('invPhone'))     orders[idx].phone=document.getElementById('invPhone').value;
   if(document.getElementById('invAddr'))      orders[idx].address=document.getElementById('invAddr').value;
   if(document.getElementById('invNotes'))     orders[idx].notes=document.getElementById('invNotes').value;
+  if(document.getElementById('invDate')){
+    const rawDate=document.getElementById('invDate').value.trim();
+    if(rawDate){ const d=new Date(rawDate); if(!isNaN(d)){ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); orders[idx].eventDate=`${y}-${m}-${day}`; } }
+  }
   // Persist all the invoice charges so they restore on next open
   orders[idx].invoiceState={
     transport: parseFloat(document.getElementById('invTransport').value)||0,
@@ -1654,6 +1661,9 @@ function saveInvoiceChanges(){
     taxPct:    parseFloat(document.getElementById('invTaxPct').value)||0,
     discount:  parseFloat(document.getElementById('invDiscount').value)||0,
     terms:     document.getElementById('invTerms')?document.getElementById('invTerms').value:'',
+    eventDate: orders[idx].eventDate||'',
+    address:   orders[idx].address||'',
+    notes:     orders[idx].notes||'',
     savedAt:   new Date().toISOString()
   };
   localStorage.setItem('zil_orders',JSON.stringify(orders));
