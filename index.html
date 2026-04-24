@@ -1220,7 +1220,7 @@ function mergeOrders(local, remote){
   const map={};
   // Remote (Sheet) is source of truth for order data
   remote.forEach(o=>{ map[o.id]=o; });
-  // Local wins for void/restore state (admin actions live locally)
+  // Local wins for void/restore state and invoice edits
   local.forEach(o=>{
     if(!map[o.id]){
       map[o.id]=o;  // order only exists locally (Sheet fetch may have failed)
@@ -1229,6 +1229,19 @@ function mergeOrders(local, remote){
       if(o.voided!==undefined) map[o.id].voided=o.voided;
       if(o.voidedAt) map[o.id].voidedAt=o.voidedAt;
       if(o.voidReason!==undefined) map[o.id].voidReason=o.voidReason;
+      // Preserve invoice edits — the Sheet Orders tab only carries the original
+      // order total; invoice saves update local invoiceState and total, which
+      // must not be overwritten by the stale remote order total on every sync.
+      if(o.invoiceState){
+        map[o.id].invoiceState = o.invoiceState;
+        map[o.id].total        = o.total;          // invoice grandTotal
+        if(o.items && o.items.length) map[o.id].items = o.items;
+        // Also keep any customer/event fields edited through the invoice form
+        if(o.customerName) map[o.id].customerName = o.customerName;
+        if(o.eventDate)    map[o.id].eventDate     = o.eventDate;
+        if(o.address  !== undefined) map[o.id].address = o.address;
+        if(o.notes    !== undefined) map[o.id].notes   = o.notes;
+      }
     }
   });
   return Object.values(map).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
@@ -1519,6 +1532,11 @@ function openInvoice(idx){
 
   const DEFAULT_TERMS = '75% deposit required at signing within 24hrs. Balance due prior to delivery or 1 day before event. Payment: Zelle or Cash. Chafers & transport charges are non-taxable. Thank you for choosing Zilicious Catering!';
 
+  // Show the modal immediately with a loading state so no stale body content
+  // is ever visible while the async Sheet fetch is in flight.
+  document.getElementById('invoiceOverlay').classList.add('open');
+  document.getElementById('invoiceBody').innerHTML=`<div role="status" aria-live="polite" style="text-align:center;padding:60px 20px;color:#999;font-size:.95rem">⏳ Loading invoice…</div>`;
+
   // Sheet is the single source of truth.
   // When a saved invoice exists on the Sheet, EVERY field is taken from the Sheet
   // exactly as stored — no mixing with local order data, no recalculation.
@@ -1577,7 +1595,6 @@ function openInvoice(idx){
       ' · (offline — showing local data)'
     );
   });
-  document.getElementById('invoiceOverlay').classList.add('open');
 }
 
 function _populateInvoiceBody(o, items, eventDateValue, subDate, savedTransport, savedExtra, savedTaxPct, savedDiscount, savedTerms, savedAt){
@@ -1791,6 +1808,9 @@ async function saveInvoiceChanges(){
       terms:     dom.terms,     savedAt: snap.exportedAt
     };
     localStorage.setItem('zil_orders', JSON.stringify(orders));
+    // Immediately refresh the admin panel table so the updated invoice
+    // total is reflected without waiting for the next loadOrders call.
+    renderOrdersAndStats(orders);
   }
 }
 
