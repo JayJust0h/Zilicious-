@@ -1024,7 +1024,13 @@ function toISODateValue(v){
   if(!raw) return '';
   // Already YYYY-MM-DD — return as-is, no Date() conversion needed
   if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-  // For any other format, parse then rebuild using LOCAL date parts
+  // If the string STARTS with YYYY-MM-DD (e.g. a full ISO timestamp like
+  // "2026-05-30T00:00:00.000Z" returned by Google Sheets / GAS), extract
+  // the date portion directly — no new Date() so no UTC→local shift.
+  const isoPrefix = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if(isoPrefix) return isoPrefix[1];
+  // For any other format (e.g. "May 30 2026"), parse then rebuild using
+  // LOCAL date parts so no timezone shift occurs.
   const d = new Date(raw);
   if(isNaN(d.getTime())) return '';
   const y   = d.getFullYear();
