@@ -998,6 +998,43 @@ function fmtPhone(i){
   else if(v.length>0) v=`(${v}`;
   i.value=v;
 }
+/* ─────────────────────────────────────────────────────────
+   DATE UTILITIES — timezone-safe
+   ─────────────────────────────────────────────────────────
+   new Date('2026-05-30') parses as UTC midnight.
+   In UTC-7 (California) that is 5pm on May 29 — wrong day.
+   Fix: always split the YYYY-MM-DD string manually and use
+   the local Date constructor so the calendar date is never
+   shifted by the viewer's timezone offset.
+─────────────────────────────────────────────────────────── */
+
+/* Parse any date string → guaranteed YYYY-MM-DD or '' (no UTC shift) */
+function toISODateValue(v){
+  const raw=String(v||'').trim();
+  if(!raw) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const mdy=raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if(mdy){ const [,m,d,y]=mdy; return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`; }
+  const dmy=raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if(dmy&&parseInt(dmy[1])>12){ const [,d,m,y]=dmy; return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`; }
+  const d=new Date(raw);
+  if(isNaN(d.getTime())) return '';
+  const y=d.getFullYear();
+  const mon=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${mon}-${day}`;
+}
+
+/* Format a YYYY-MM-DD string for display — splits the string manually
+   so no timezone shift can occur regardless of the viewer's locale. */
+function formatEventDate(isoStr, opts){
+  if(!isoStr) return '';
+  const [y,m,d]=isoStr.split('-').map(Number);
+  if(!y||!m||!d) return isoStr;
+  const dt=new Date(y, m-1, d, 12, 0, 0);
+  return dt.toLocaleDateString('en-US', opts||{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+
 function validateDate(){
   const val=document.getElementById('fDate').value;
   const blocked=JSON.parse(localStorage.getItem('zil_blocked')||'[]');
@@ -1046,7 +1083,7 @@ async function submitOrder(){
       order_id:      order.id,
       customer_name: order.customerName,
       phone:         order.phone,
-      event_date:    new Date(order.eventDate+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}),
+      event_date:    formatEventDate(order.eventDate, {weekday:'long',month:'long',day:'numeric',year:'numeric'}),
       items_list:    itemsList,
       total:         '$'+order.total.toLocaleString(),
       notes:         order.notes || 'None',
@@ -1065,7 +1102,7 @@ async function submitOrder(){
     btn.disabled=false; btn.innerHTML='Submit Order ✓';
   }
 
-  const fmtDate=new Date(date+'T00:00:00').toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const fmtDate=formatEventDate(date, {weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('successMsg').innerHTML=`Thank you, <strong>${name}</strong>! Your order totalling <strong>$${total.toLocaleString()}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you at <strong>+1 ${phoneFormatted}</strong> shortly.`;
   document.getElementById('modalTitle').textContent='All Done!';
   document.getElementById('screenForm').style.display='none';
@@ -1188,16 +1225,9 @@ function normaliseOrder(o){
     const d = new Date(o.timestamp);
     o.timestamp = isNaN(d) ? new Date().toISOString() : d.toISOString();
   }
-  // Fix eventDate: sheet may store it as "Monday, May 10, 2026" → convert to "2026-05-10"
-  if(o.eventDate && o.eventDate.includes(',')){
-    const d = new Date(o.eventDate);
-    if(!isNaN(d)){
-      const y = d.getFullYear();
-      const m = String(d.getMonth()+1).padStart(2,'0');
-      const day = String(d.getDate()).padStart(2,'0');
-      o.eventDate = `${y}-${m}-${day}`;
-    }
-  }
+  // Ensure eventDate is consistently YYYY-MM-DD (timezone-safe)
+  const parsedEventDate = toISODateValue(o.eventDate);
+  if(parsedEventDate) o.eventDate = parsedEventDate;
   // Ensure items array exists
   if(!Array.isArray(o.items)) o.items=[];
   // Ensure total is a number
@@ -1802,7 +1832,7 @@ function openReceipt(idx){
   const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
   const o=orders[idx]; if(!o) return;
   const now=new Date();
-  const evtDate=new Date(o.eventDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const evtDate=formatEventDate(o.eventDate, {month:'short',day:'numeric',year:'numeric'});
   const printedOn=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
 
   const itemRows=o.items.map(it=>`
