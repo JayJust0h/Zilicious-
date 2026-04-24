@@ -1263,6 +1263,13 @@ async function syncInvoicesFromSheet(){
         const sheetTs=sheetInv.exportedAt||sheetInv.savedAt;
         if(!localTs||(sheetTs&&new Date(sheetTs)>=new Date(localTs))){
           o.invoiceState=sheetInv;
+          // Also propagate the invoice's edited fields into the order so the
+          // admin panel immediately displays the correct totals/names/items
+          // without requiring a manual save/export first.
+          if(sheetInv.items&&sheetInv.items.length) o.items=sheetInv.items;
+          if(sheetInv.grandTotal) o.total=sheetInv.grandTotal;
+          if(sheetInv.customerName) o.customerName=sheetInv.customerName;
+          if(sheetInv.eventDate) o.eventDate=sheetInv.eventDate;
           updated++;
         }
       }
