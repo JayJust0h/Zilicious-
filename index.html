@@ -2070,6 +2070,94 @@ function restoreOrder(idx){
   localStorage.setItem('zil_orders',JSON.stringify(orders)); loadOrders(); renderVoided();
 }
 function toggleCard(id){ document.getElementById(`card-${id}`).classList.toggle('open'); }
+
+/* ── RECEIPT ── */
+function openReceipt(idx){
+  const orders=JSON.parse(localStorage.getItem('zil_orders')||'[]');
+  const o=orders[idx]; if(!o) return;
+  const now=new Date();
+  const evtDate=formatEventDate(o.eventDate, {month:'short',day:'numeric',year:'numeric'});
+  const printedOn=now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+  const itemRows=o.items.map(it=>`
+    <tr>
+      <td>${it.name}</td>
+      <td style="text-align:center">${it.qty}</td>
+      <td style="text-align:right">$${it.subtotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+    </tr>`).join('');
+
+  document.getElementById('receiptBody').innerHTML=`
+    <img src="232784.png" class="rct-logo" onerror="this.style.display='none'">
+    <div class="rct-biz"><h2>Zilicious Catering</h2><p>Luxury Catering · Premium Events</p></div>
+    <hr class="rct-dash">
+    <div class="rct-meta">
+      <div><span class="lbl">Customer</span><span class="val">${o.customerName}</span></div>
+      <div><span class="lbl">Phone</span><span class="val">${o.phone}</span></div>
+      <div><span class="lbl">Event Date</span><span class="val">${evtDate}</span></div>
+      ${o.address?`<div><span class="lbl">Location</span><span class="val">${o.address}</span></div>`:''}
+    </div>
+    <hr class="rct-dash">
+    <table class="rct-items-tbl">
+      <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <hr class="rct-dash solid">
+    <div class="rct-totals-section">
+      <div class="rct-tot-row"><span>Subtotal</span><span id="rctSubtotal">$${o.total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="rct-tax-line">
+        <label>Transport ($)</label>
+        <input type="number" id="rctTransport" value="0" min="0" step="0.01" placeholder="0.00" oninput="recalcReceipt(${o.total})">
+        <span id="rctTransAmt">$0.00</span>
+      </div>
+      <div class="rct-tax-line">
+        <label>Extra Charges ($)</label>
+        <input type="number" id="rctExtra" value="0" min="0" step="0.01" placeholder="0.00" oninput="recalcReceipt(${o.total})">
+        <span id="rctExtraAmt">$0.00</span>
+      </div>
+      <div class="rct-tax-line">
+        <label>Service Tax (%)</label>
+        <input type="number" id="rctTaxPct" value="0" min="0" max="100" step="0.1" placeholder="0" oninput="recalcReceipt(${o.total})">
+        <span id="rctTaxAmt">$0.00</span>
+      </div>
+      <div class="rct-tot-row grand"><span>TOTAL</span><span id="rctGrand">$${o.total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+    </div>
+    <hr class="rct-dash">
+    <div style="margin:10px 0">
+      <div style="font-size:.72rem;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Payment Method</div>
+      <div style="display:flex;gap:16px;font-size:.88rem;font-weight:600">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="radio" name="rctPayment" value="Zelle" style="accent-color:#e8006f"> Zelle
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="radio" name="rctPayment" value="Cash" style="accent-color:#e8006f"> Cash
+        </label>
+      </div>
+    </div>
+    ${o.notes?`<hr class="rct-dash"><p style="font-size:.76rem;color:#777;text-align:center">${o.notes}</p>`:''}
+    <div class="rct-footer"><div class="ty">Thank You!</div><p>We appreciate your business.<br>Zilicious Catering · 951-807-1929</p></div>
+    <div class="rct-oid">Ref: ${o.id} · Printed: ${printedOn}</div>`;
+
+  document.getElementById('receiptOverlay').classList.add('open');
+}
+
+function recalcReceipt(baseSubtotal){
+  const transport=parseFloat(document.getElementById('rctTransport').value)||0;
+  const extra=parseFloat(document.getElementById('rctExtra').value)||0;
+  const taxPct=parseFloat(document.getElementById('rctTaxPct').value)||0;
+  const taxAmt=baseSubtotal*taxPct/100;
+  const grand=baseSubtotal+transport+extra+taxAmt;
+  const fmt=v=>'$'+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('rctTransAmt').textContent=fmt(transport);
+  document.getElementById('rctExtraAmt').textContent=fmt(extra);
+  document.getElementById('rctTaxAmt').textContent=fmt(taxAmt);
+  document.getElementById('rctGrand').textContent=fmt(grand);
+}
+
+function closeReceipt(){ document.getElementById('receiptOverlay').classList.remove('open'); }
+function shareReceipt(){
+  if(navigator.clipboard) navigator.clipboard.writeText(location.href).then(()=>alert('URL copied! Use Print to save as PDF.'));
+  else alert('Use the Print button to save as PDF.');
+}
 </script>
 </body>
 </html>
