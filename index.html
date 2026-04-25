@@ -1004,6 +1004,17 @@ function ensureSheetSafePhone(phone){
   const noApostrophe=raw.replace(/^'+/,'');
   return noApostrophe.startsWith('+1') ? `'${noApostrophe}` : noApostrophe;
 }
+/**
+ * Prefix a YYYY-MM-DD date with an apostrophe so Google Sheets stores it
+ * as plain text and never converts it to a date serial.
+ * This prevents any timezone shift when the GAS backend reads the value back.
+ * toISODateValue() already strips this apostrophe on read-back.
+ */
+function ensureSheetSafeDate(dateStr){
+  const clean = toISODateValue(String(dateStr||'').trim());
+  if(!clean) return String(dateStr||'');
+  return `'${clean}`;
+}
 /* ═══════════════════════════════════════════════════════════
    DATE UTILITIES — TIMEZONE-PROOF
    ═══════════════════════════════════════════════════════════
@@ -1156,11 +1167,13 @@ async function submitOrder(){
   }
 
   // Send to Google Sheet via GET with base64-encoded payload (avoids CORS/no-cors issues)
+  // eventDate is apostrophe-prefixed so Sheets stores it as plain text (no date-serial/timezone conversion).
   if(SHEET_URL){
     const btn=document.getElementById('submitBtn');
     btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Submitting…';
     try{
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(order))));
+      const sheetOrder = Object.assign({}, order, { eventDate: ensureSheetSafeDate(order.eventDate) });
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(sheetOrder))));
       await fetch(`${SHEET_URL}?action=saveOrder&data=${encodeURIComponent(encoded)}`, {mode:'no-cors'});
     }catch(e){ console.warn('Sheet POST failed — order saved locally',e); }
     btn.disabled=false; btn.innerHTML='Submit Order ✓';
@@ -1806,11 +1819,15 @@ async function saveInvoiceChanges(){
   if(btn){ btn.textContent='⏳ Saving…'; btn.disabled=true; }
 
   // ── Send to Sheet ──────────────────────────────────────────────────
+  // Use a sheet-safe copy where eventDate is apostrophe-prefixed so Sheets
+  // stores it as plain text and never converts it to a date serial.
+  // snap.eventDate stays clean (YYYY-MM-DD) for localStorage below.
+  const sheetSnap = Object.assign({}, snap, { eventDate: ensureSheetSafeDate(snap.eventDate) });
   // We send and then verify the EXACT values came back, not just that
   // the row exists. This catches silent overwrites or stale caches.
   let verified = false;
   for(let attempt=1; attempt<=3; attempt++){
-    await sendToSheet('saveInvoice', snap);
+    await sendToSheet('saveInvoice', sheetSnap);
     await new Promise(r=>setTimeout(r, 2200));
     try{
       const check = await fetchFromSheet('getInvoices');
@@ -1915,7 +1932,7 @@ async function exportAllInvoicesToSheet(){
     const ok = await sendToSheet('saveInvoice',{
       invoiceId:'INV-'+o.id, orderId:o.id, exportedAt:s.savedAt||new Date().toISOString(),
       customerName:o.customerName, phone:ensureSheetSafePhone(o.phone||''),
-      eventDate:o.eventDate, address:o.address||'', notes:o.notes||'',
+      eventDate:ensureSheetSafeDate(o.eventDate), address:o.address||'', notes:o.notes||'',
       items:o.items||[], transport:s.transport||0, extra:s.extra||0,
       taxPct:s.taxPct||0, discount:s.discount||0,
       grandTotal:+grand.toFixed(2), deposit75:+(grand*0.75).toFixed(2),
