@@ -1,0 +1,4 @@
+{
+  "outputDirectory": ".",
+  "installCommand": "npm install"
+}

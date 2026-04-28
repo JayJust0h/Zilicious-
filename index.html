@@ -1163,6 +1163,9 @@ async function submitOrder(){
     btn.disabled=false; btn.innerHTML='Submit Order ✓';
   }
 
+  // Also persist to Vercel Postgres (non-blocking — never delays the success screen)
+  saveOrderToDb(order);
+
   const fmtDate=formatEventDate(date, {weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('successMsg').innerHTML=`Thank you, <strong>${name}</strong>! Your order totalling <strong>$${total.toLocaleString()}</strong> for <strong>${fmtDate}</strong> has been received.<br><br>We'll contact you at <strong>+1 ${phoneFormatted}</strong> shortly.`;
   document.getElementById('modalTitle').textContent='All Done!';
@@ -1296,13 +1299,15 @@ async function loadOrders(){
 
   // Fetch orders AND invoices in parallel — both needed before first render
   const local = JSON.parse(localStorage.getItem('zil_orders')||'[]').map(normaliseOrder);
-  const [remote, invData] = await Promise.all([
+  const [remote, dbOrders, invData] = await Promise.all([
     fetchSheetOrders(),
+    fetchDbOrders(),
     fetchFromSheet('getInvoices')
   ]);
 
-  // Merge orders
+  // Three-way merge: local → Sheet → Vercel Postgres (DB is additive source)
   let orders = remote.length ? mergeOrders(local, remote) : local;
+  if(dbOrders.length) orders = mergeOrders(orders, dbOrders);
 
   // Merge invoice charges into each order BEFORE rendering
   // so the very first render shows correct Sheet data
@@ -1315,8 +1320,8 @@ async function loadOrders(){
   renderOrdersAndStats(orders);
 
   if(syncBtn){
-    syncBtn.textContent = remote.length
-      ? `✓ Synced (${remote.length} orders)`
+    syncBtn.textContent = orders.length
+      ? `✓ Synced (${orders.length} orders)`
       : '⚠ Sheet unreachable — showing local';
     setTimeout(()=>{ syncBtn.textContent='↻ Sync All Orders'; syncBtn.disabled=false; }, 3000);
   }
@@ -1327,12 +1332,14 @@ async function syncOrders(){
   if(syncBtn){ syncBtn.textContent='⟳ Syncing…'; syncBtn.disabled=true; }
 
   const local = JSON.parse(localStorage.getItem('zil_orders')||'[]').map(normaliseOrder);
-  const [remote, invData] = await Promise.all([
+  const [remote, dbOrders, invData] = await Promise.all([
     fetchSheetOrders(),
+    fetchDbOrders(),
     fetchFromSheet('getInvoices')
   ]);
 
   let orders = remote.length ? mergeOrders(local, remote) : local;
+  if(dbOrders.length) orders = mergeOrders(orders, dbOrders);
 
   const sheetInvoices = invData.invoices || [];
   if(sheetInvoices.length){
@@ -1343,8 +1350,8 @@ async function syncOrders(){
   renderOrdersAndStats(orders);
 
   if(syncBtn){
-    syncBtn.textContent = remote.length
-      ? `✓ ${remote.length} orders synced`
+    syncBtn.textContent = orders.length
+      ? `✓ ${orders.length} orders synced`
       : '⚠ Could not reach Sheet';
     setTimeout(()=>{ syncBtn.textContent='↻ Sync All Orders'; syncBtn.disabled=false; }, 3500);
   }
@@ -1961,6 +1968,30 @@ async function fetchFromSheet(action){
     const clean=text.replace(/^[^{[]*/,'').replace(/[^}\]]*$/,'');
     return JSON.parse(clean);
   }catch(e){ console.warn('fetchFromSheet failed:',action,e); return {}; }
+}
+
+/* ── VERCEL POSTGRES HELPERS ── */
+// Fire-and-forget: POST the order to /api/orders (Vercel Postgres).
+// Failures are logged as warnings and never surface to the customer.
+function saveOrderToDb(order){
+  fetch('/api/orders',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(order)
+  }).then(r=>{ if(!r.ok) r.text().then(t=>console.warn('saveOrderToDb non-OK:',r.status,t)); })
+    .catch(e=>console.warn('saveOrderToDb failed (non-critical):',e));
+}
+
+// Fetch all orders from /api/orders (Vercel Postgres) for the admin panel.
+// Returns an array of order objects or [] on any failure.
+async function fetchDbOrders(){
+  try{
+    const res=await fetch('/api/orders');
+    if(!res.ok){ console.warn('fetchDbOrders HTTP error',res.status); return []; }
+    const data=await res.json();
+    if(!Array.isArray(data.orders)){ console.warn('Unexpected /api/orders response',data); return []; }
+    return data.orders.map(normaliseOrder);
+  }catch(e){ console.warn('fetchDbOrders failed:',e.message); return []; }
 }
 
 /* ── CONTRACTS — Sheet as source of truth ── */
