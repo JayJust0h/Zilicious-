@@ -1,9 +1,9 @@
 {
   "name": "zilicious-catering",
   "version": "1.0.0",
-  "description": "Zilicious Catering — Luxury Catering & Premium Events",
   "private": true,
+  "type": "module",
   "dependencies": {
-    "@vercel/postgres": "^0.10.0"
+    "@vercel/kv": "^1.0.0"
   }
 }
