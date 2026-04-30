@@ -1,17 +1,7 @@
 /**
- * _kv.js — thin wrapper around Vercel KV (Redis)
- * Shared by all API routes.
- *
- * Vercel KV stores everything as key-value pairs.
- * We use simple list keys:
- *   zilicious:orders      → JSON array of all orders
- *   zilicious:invoices    → JSON array of all invoices  (upserted by orderId)
- *   zilicious:contracts   → JSON array of all contracts
- *   zilicious:receipts    → JSON array of all receipts  (upserted by orderId)
- *   zilicious:blocked     → JSON array of blocked dates
+ * _kv.js — Vercel KV helper (CommonJS)
  */
-
-import { kv } from '@vercel/kv';
+const { kv } = require('@vercel/kv');
 
 const KEYS = {
   orders:    'zilicious:orders',
@@ -21,44 +11,41 @@ const KEYS = {
   blocked:   'zilicious:blocked',
 };
 
-export async function getList(name) {
+async function getList(name) {
   const raw = await kv.get(KEYS[name]);
   return Array.isArray(raw) ? raw : [];
 }
 
-export async function setList(name, arr) {
+async function setList(name, arr) {
   await kv.set(KEYS[name], arr);
 }
 
-/** Append an item — no duplicate check */
-export async function append(name, item) {
+async function upsert(name, item, keyField = 'id') {
   const list = await getList(name);
-  list.unshift(item); // newest first
-  await setList(name, list);
-}
-
-/** Upsert by a key field (e.g. 'id' or 'orderId') */
-export async function upsert(name, item, keyField = 'id') {
-  const list = await getList(name);
-  const idx  = list.findIndex(x => x[keyField] === item[keyField]);
+  const idx  = list.findIndex(x => String(x[keyField]) === String(item[keyField]));
   if (idx >= 0) list[idx] = item;
   else list.unshift(item);
   await setList(name, list);
 }
 
-/** Remove by key field value */
-export async function remove(name, keyField, value) {
+async function append(name, item) {
   const list = await getList(name);
-  await setList(name, list.filter(x => x[keyField] !== value));
+  list.unshift(item);
+  await setList(name, list);
 }
 
-/** CORS headers — allow your Vercel domain and localhost */
-export function cors(res) {
+async function removeItem(name, keyField, value) {
+  const list = await getList(name);
+  await setList(name, list.filter(x => String(x[keyField]) !== String(value)));
+}
+
+function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  return res;
 }
 
-export function ok(res, data)  { cors(res); return res.status(200).json({ ok: true,  ...data }); }
-export function err(res, msg)  { cors(res); return res.status(500).json({ ok: false, error: msg }); }
+function ok(res, data)  { setCors(res); return res.status(200).json({ ok: true,  ...data }); }
+function err(res, msg)  { setCors(res); return res.status(500).json({ ok: false, error: msg }); }
+
+module.exports = { getList, setList, upsert, append, removeItem, setCors, ok, err };
